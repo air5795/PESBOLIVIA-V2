@@ -28,9 +28,9 @@ if ($entorno == 'local') {
     error_reporting(E_ALL);
 } else {
     $db_host = 'localhost';
-    $db_user = 'airsoftb_naxsan';
+    $db_user = 'airsoftb_aleigles2';
     $db_password = '71811452Ale*';
-    $db_name = 'airsoftb_pesbolivia';
+    $db_name = 'airsoftb_pesbolivia-v2';
     
     // Ocultar errores en producción
     ini_set('display_errors', 0);
