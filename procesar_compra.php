@@ -107,6 +107,7 @@ if (mysqli_stmt_execute($stmt)) {
         mysqli_stmt_close($stmt_info);
 
         $compra_data = [
+            'id_compra' => $id_compra,
             'codigo_compra' => $codigo_compra,
             'comprador_nombre' => $info['comprador_nombre'],
             'comprador_email' => $info['comprador_email'],
@@ -114,7 +115,7 @@ if (mysqli_stmt_execute($stmt)) {
             'monto_total' => $monto_total,
             'fecha_compra' => date('d/m/Y H:i'),
             'tipo_pago' => $info['tipo_pago_nombre'],
-            'rol_destino' => 'admin' // Para el link del panel
+            'rol_destino' => 'superadmin' 
         ];
 
         // 2. Enviar email al Comprador
