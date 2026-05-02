@@ -962,7 +962,7 @@ endif; ?>
         document.getElementById('comprobanteSection').style.display = 'block';
     }
     
-    // Validar formulario pre-submit
+    // Validar formulario pre-submit y agregar loading
     let amzForm = document.getElementById('formCompra');
     if(amzForm) {
         amzForm.addEventListener('submit', function(e) {
@@ -976,6 +976,13 @@ endif; ?>
                 });
                 return false;
             }
+
+            // Efecto de Loading
+            const btnSubmit = this.querySelector('button[type="submit"]');
+            btnSubmit.disabled = true;
+            btnSubmit.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Procesando Pago...';
+            
+            return true;
         });
     }
 </script>

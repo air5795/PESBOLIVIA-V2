@@ -169,7 +169,7 @@ class EmailSender {
             </div>
             
             <p style='text-align: center;'>
-                <a href='" . BASE_URL . "/modules/{$compra_data['rol_destino']}/compras.php' style='background-color: #007bff; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block;'>
+                <a href='" . BASE_URL . "/modules/{$compra_data['rol_destino']}/compras.php?id_compra={$compra_data['id_compra']}' style='background-color: #007bff; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block;'>
                     Ver Compra
                 </a>
             </p>
