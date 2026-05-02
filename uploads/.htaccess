@@ -1,0 +1,21 @@
+# Prevenir la ejecución de scripts PHP o maliciosos en la carpeta de subidas
+<FilesMatch "\.(php|php3|php4|php5|php7|php8|phtml|pl|py|jsp|asp|htm|html|shtml|sh|cgi)$">
+    Require all denied
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Deshabilitar forzado de engine PHP
+<IfModule mod_php.c>
+    php_flag engine off
+</IfModule>
+<IfModule mod_php7.c>
+    php_flag engine off
+</IfModule>
+
+# Sólo asegurar permitir ciertos archivos multimedia si es necesario
+<FilesMatch "\.(jpg|jpeg|png|gif|webp|pdf)$">
+    Require all granted
+    Order allow,deny
+    Allow from all
+</FilesMatch>
