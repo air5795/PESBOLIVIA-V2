@@ -5,7 +5,7 @@
 # Activar RewriteEngine
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    RewriteBase /pesbolivia/
+    RewriteBase /
     
     # Forzar HTTPS en producción (descomentar en producción)
     # RewriteCond %{HTTPS} off
@@ -72,6 +72,6 @@ php_value max_input_time 300
 # =====================================================
 # PÁGINAS DE ERROR PERSONALIZADAS
 # =====================================================
-ErrorDocument 404 /pesbolivia/404.php
-ErrorDocument 403 /pesbolivia/403.php
-ErrorDocument 500 /pesbolivia/500.php
+ErrorDocument 404 /404.php
+ErrorDocument 403 /403.php
+ErrorDocument 500 /500.php
