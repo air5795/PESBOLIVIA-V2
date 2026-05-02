@@ -12,12 +12,17 @@ $hash = hash_password($nueva_clave);
 // Actualizamos en la base de datos
 $query = "UPDATE usuarios SET password = '$hash' WHERE usuario = '$usuario_reset'";
 
+session_start();
+unset($_SESSION['bloqueo_hasta']);
+unset($_SESSION['intentos_fallidos']);
+
 if (mysqli_query($conexion, $query)) {
-    echo "<h2>¡Contraseña actualizada con éxito!</h2>";
+    echo "<h2>¡Contraseña actualizada y Bloqueo eliminado!</h2>";
     echo "<p>Usuario: <b>$usuario_reset</b></p>";
     echo "<p>Nueva contraseña: <b>$nueva_clave</b></p>";
     echo "<hr>";
-    echo "<p style='color:red;'><b>IMPORTANTE:</b> Por seguridad, borra este archivo (reset.php) después de probar el acceso.</p>";
+    echo "<p><b>Ya puedes intentar entrar al login ahora mismo.</b></p>";
+    echo "<p style='color:red;'><b>RECORDATORIO:</b> Borra este archivo (reset.php) después de entrar.</p>";
 } else {
     echo "Error al actualizar: " . mysqli_error($conexion);
 }
