@@ -36,7 +36,7 @@ if (ENTORNO == 'local') {
     define('BASE_URL', 'http://localhost/pesbolivia');
 }
 else {
-    define('BASE_URL', 'https://pesbolivia.airsoftbol.com');
+    define('BASE_URL', 'https://pes-bolivia.airsoftbol.com');
 }
 
 // =====================================================

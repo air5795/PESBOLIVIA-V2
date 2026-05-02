@@ -7,9 +7,9 @@
     RewriteEngine On
     RewriteBase /
     
-    # Forzar HTTPS en producción (descomentar en producción)
-    # RewriteCond %{HTTPS} off
-    # RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+    # Forzar HTTPS en producción
+    RewriteCond %{HTTPS} off
+    RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
     
     # Evitar acceso directo a archivos de configuración
     RewriteRule ^config/ - [F,L]
