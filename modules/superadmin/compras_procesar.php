@@ -80,21 +80,20 @@ if ($accion === 'aprobar') {
     mysqli_stmt_close($stmt_acceso);
     */
     
-    // Enviar email de aprobación (deshabilitado temporalmente)
-    /*
+    // Enviar email de aprobación
     try {
         $emailSender = new EmailSender();
         $emailSender->email_compra_aprobada([
-            'nombre' => $compra['comprador_nombre'],
-            'email' => $compra['comprador_email'],
+            'comprador_nombre' => $compra['comprador_nombre'],
+            'comprador_email' => $compra['comprador_email'],
             'codigo_compra' => $compra['codigo_compra'],
-            'producto' => $compra['producto_nombre'],
+            'producto_nombre' => $compra['producto_nombre'],
+            'monto_total' => $compra['monto_total'],
             'drive_link' => $compra['drive_link']
         ]);
     } catch (Exception $e) {
-        // Continuar aunque falle el email
+        error_log("Error enviando email de aprobación: " . $e->getMessage());
     }
-    */
     
     Session::registrar_actividad($id_aprobador, 'aprobar', 'compras', $id, 
         "Compra aprobada: " . $compra['codigo_compra']);
@@ -114,21 +113,18 @@ if ($accion === 'aprobar') {
     mysqli_stmt_execute($stmt);
     mysqli_stmt_close($stmt);
     
-    // Enviar email de rechazo (deshabilitado temporalmente)
-    /*
+    // Enviar email de rechazo
     try {
         $emailSender = new EmailSender();
         $emailSender->email_compra_rechazada([
-            'nombre' => $compra['comprador_nombre'],
-            'email' => $compra['comprador_email'],
+            'comprador_nombre' => $compra['comprador_nombre'],
+            'comprador_email' => $compra['comprador_email'],
             'codigo_compra' => $compra['codigo_compra'],
-            'producto' => $compra['producto_nombre'],
-            'motivo' => $observaciones
+            'observaciones' => $observaciones
         ]);
     } catch (Exception $e) {
-        // Continuar aunque falle el email
+        error_log("Error enviando email de rechazo: " . $e->getMessage());
     }
-    */
     
     Session::registrar_actividad($id_aprobador, 'rechazar', 'compras', $id, 
         "Compra rechazada: " . $compra['codigo_compra']);

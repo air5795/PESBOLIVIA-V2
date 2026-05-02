@@ -12,11 +12,13 @@ if (!isset($_GET['id'])) {
 $id_compra = intval($_GET['id']);
 $id_editor = Session::get_user_id();
 
-// Verificar que la compra es de un producto del editor
-$query_check = "SELECT c.*, pe.id_editor 
+// Verificar que la compra es de un producto del editor y obtener datos para el email
+$query_check = "SELECT c.*, pe.id_editor, p.nombre as producto_nombre, p.precio, p.drive_link,
+                u.nombre as comprador_nombre, u.email as comprador_email
                 FROM compras c
                 INNER JOIN productos p ON c.id_producto = p.id
                 INNER JOIN producto_editores pe ON p.id = pe.id_producto
+                INNER JOIN usuarios u ON c.id_comprador = u.id
                 WHERE c.id = ? AND pe.id_editor = ? AND c.estado = 'pendiente' AND pe.porcentaje >= 100";
 $stmt = mysqli_prepare($conexion, $query_check);
 mysqli_stmt_bind_param($stmt, "ii", $id_compra, $id_editor);
@@ -25,6 +27,7 @@ $result = mysqli_stmt_get_result($stmt);
 
 if (!$compra = mysqli_fetch_assoc($result)) {
     $_SESSION['error'] = "No tienes permiso para aprobar esta compra";
+    mysqli_stmt_close($stmt);
     redirect('compras.php');
 }
 
@@ -65,8 +68,23 @@ if (mysqli_stmt_execute($stmt)) {
 
     mysqli_stmt_close($stmt_editores);
 
+    // Enviar email de aprobación al comprador
+    try {
+        $emailSender = new EmailSender();
+        $emailSender->email_compra_aprobada([
+            'comprador_nombre' => $compra['comprador_nombre'],
+            'comprador_email' => $compra['comprador_email'],
+            'codigo_compra' => $compra['codigo_compra'],
+            'producto_nombre' => $compra['producto_nombre'],
+            'monto_total' => $compra['monto_total'],
+            'drive_link' => $compra['drive_link']
+        ]);
+    } catch (Exception $e) {
+        error_log("Error enviando email de aprobación (Editor): " . $e->getMessage());
+    }
+
     Session::registrar_actividad($id_editor, 'aprobar', 'compras', $id_compra, "Compra aprobada: {$compra['codigo_compra']}");
-    $_SESSION['success'] = "Compra aprobada correctamente. Comisiones calculadas.";
+    $_SESSION['success'] = "Compra aprobada correctamente. Comisiones calculadas y cliente notificado.";
 }
 else {
     $_SESSION['error'] = "Error al aprobar la compra";
