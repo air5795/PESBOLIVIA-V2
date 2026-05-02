@@ -73,8 +73,8 @@ define('MAX_UPLOAD_SIZE', $CONFIG['max_upload_size'] ?? 1048576); // 1MB en byte
 // SMTP
 define('SMTP_HOST', $CONFIG['smtp_host'] ?? 'smtp.titan.email');
 define('SMTP_PORT', $CONFIG['smtp_port'] ?? 587);
-define('SMTP_USER', $CONFIG['smtp_user'] ?? '');
-define('SMTP_PASSWORD', $CONFIG['smtp_password'] ?? '');
+define('SMTP_USER', $CONFIG['smtp_user'] ?? 'airpatch@pesbolivia.airsoftbol.com');
+define('SMTP_PASSWORD', $CONFIG['smtp_password'] ?? '123456789Ale*');
 define('SMTP_FROM_EMAIL', $CONFIG['smtp_from_email'] ?? EMAIL_SISTEMA);
 define('SMTP_FROM_NAME', $CONFIG['smtp_from_name'] ?? NOMBRE_SISTEMA);
 
