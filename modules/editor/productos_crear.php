@@ -18,12 +18,13 @@ $stmt = mysqli_prepare($conexion, $query_metodos);
 mysqli_stmt_bind_param($stmt, "i", $id_editor);
 mysqli_stmt_execute($stmt);
 $metodos_pago = mysqli_stmt_get_result($stmt);
+$num_metodos = mysqli_num_rows($metodos_pago);
 mysqli_stmt_close($stmt);
 
 include '../../includes/header.php';
 ?>
 
-<?php if (mysqli_num_rows($metodos_pago) === 0): ?>
+<?php if ($num_metodos === 0): ?>
 <div class="alert alert-danger">
     <i class="fas fa-exclamation-lock me-2"></i>
     <strong>Función Bloqueada:</strong> No puedes crear productos de pago porque no tienes métodos de pago configurados. 
@@ -250,7 +251,7 @@ function toggleTipoProducto() {
     }
     
     // Precio
-    const tieneMetodos = <?php echo (mysqli_num_rows($metodos_pago) > 0) ? 'true' : 'false'; ?>;
+    const tieneMetodos = <?php echo ($num_metodos > 0) ? 'true' : 'false'; ?>;
     const selectGratuito = document.getElementById('esGratuito');
 
     if (!tieneMetodos) {
