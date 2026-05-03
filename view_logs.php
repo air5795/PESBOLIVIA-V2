@@ -1,12 +1,28 @@
 <?php
-echo "<h1>Visor de Logs (Últimas 50 líneas)</h1>";
-$logFile = 'error_log'; // Nombre estándar en cPanel/HostGator
+echo "<h1>Visor de Logs (Buscando archivo...)</h1>";
 
-if (file_exists($logFile)) {
+$posibles_rutas = [
+    'error_log',
+    '../error_log',
+    'public_html/error_log',
+    '/home1/airsoftb/public_html/error_log',
+    '/home1/airsoftb/pes-bolivia.airsoftbol.com/error_log'
+];
+
+$logFile = null;
+foreach ($posibles_rutas as $ruta) {
+    if (file_exists($ruta)) {
+        $logFile = $ruta;
+        break;
+    }
+}
+
+if ($logFile) {
+    echo "<p>Archivo encontrado en: <b>$logFile</b></p>";
     $lines = file($logFile);
     $lastLines = array_slice($lines, -50);
-    echo "<pre style='background:#f4f4f4; padding:10px; border:1px solid #ccc;'>" . htmlspecialchars(implode("", $lastLines)) . "</pre>";
+    echo "<pre style='background:#111; color:#eee; padding:15px; border-radius:8px; overflow:auto; max-height:600px;'>" . htmlspecialchars(implode("", $lastLines)) . "</pre>";
 } else {
-    echo "<p>No se encontró el archivo error_log en la raíz.</p>";
+    echo "<p style='color:red;'>No se encontró ningún archivo de log. Intenta aprobar una compra para que el servidor genere uno.</p>";
 }
 ?>
