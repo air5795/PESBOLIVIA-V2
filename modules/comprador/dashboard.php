@@ -55,8 +55,10 @@ include '../../includes/header.php';
             <div class="stat-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
                 <i class="fas fa-shopping-cart"></i>
             </div>
-            <h3><?php echo $stats['total_compras']; ?></h3>
-            <p>Total Compras</p>
+            <div class="stat-info">
+                <h3><?php echo $stats['total_compras']; ?></h3>
+                <p>Total Compras</p>
+            </div>
         </div>
     </div>
     
@@ -65,8 +67,10 @@ include '../../includes/header.php';
             <div class="stat-icon" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: white;">
                 <i class="fas fa-clock"></i>
             </div>
-            <h3><?php echo $stats['pendientes']; ?></h3>
-            <p>Pendientes</p>
+            <div class="stat-info">
+                <h3><?php echo $stats['pendientes']; ?></h3>
+                <p>Pendientes</p>
+            </div>
         </div>
     </div>
     
@@ -75,8 +79,10 @@ include '../../includes/header.php';
             <div class="stat-icon" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: white;">
                 <i class="fas fa-check"></i>
             </div>
-            <h3><?php echo $stats['aprobadas']; ?></h3>
-            <p>Aprobadas</p>
+            <div class="stat-info">
+                <h3><?php echo $stats['aprobadas']; ?></h3>
+                <p>Aprobadas</p>
+            </div>
         </div>
     </div>
     
@@ -85,8 +91,10 @@ include '../../includes/header.php';
             <div class="stat-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white;">
                 <i class="fas fa-dollar-sign"></i>
             </div>
-            <h3><?php echo formatear_monto($stats['total_gastado']); ?></h3>
-            <p>Total Invertido</p>
+            <div class="stat-info">
+                <h3><?php echo formatear_monto($stats['total_gastado']); ?></h3>
+                <p>Total Invertido</p>
+            </div>
         </div>
     </div>
 </div>

@@ -73,8 +73,10 @@ include '../../includes/header.php';
             <div class="stat-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white;">
                 <i class="fas fa-shopping-cart"></i>
             </div>
-            <h3><?php echo $stats['total']; ?></h3>
-            <p>Total Compras</p>
+            <div class="stat-info">
+                <h3><?php echo $stats['total']; ?></h3>
+                <p>Total Compras</p>
+            </div>
         </div>
     </div>
     
@@ -83,8 +85,10 @@ include '../../includes/header.php';
             <div class="stat-icon" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: white;">
                 <i class="fas fa-clock"></i>
             </div>
-            <h3><?php echo $stats['pendientes']; ?></h3>
-            <p>Pendientes</p>
+            <div class="stat-info">
+                <h3><?php echo $stats['pendientes']; ?></h3>
+                <p>Pendientes</p>
+            </div>
         </div>
     </div>
     
@@ -93,8 +97,10 @@ include '../../includes/header.php';
             <div class="stat-icon" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: white;">
                 <i class="fas fa-check"></i>
             </div>
-            <h3><?php echo $stats['aprobados']; ?></h3>
-            <p>Aprobados</p>
+            <div class="stat-info">
+                <h3><?php echo $stats['aprobados']; ?></h3>
+                <p>Aprobados</p>
+            </div>
         </div>
     </div>
     
@@ -103,8 +109,10 @@ include '../../includes/header.php';
             <div class="stat-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white;">
                 <i class="fas fa-times"></i>
             </div>
-            <h3><?php echo $stats['rechazados']; ?></h3>
-            <p>Rechazados</p>
+            <div class="stat-info">
+                <h3><?php echo $stats['rechazados']; ?></h3>
+                <p>Rechazados</p>
+            </div>
         </div>
     </div>
 </div>
