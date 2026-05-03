@@ -129,10 +129,13 @@ if ($categorias) {
             background-color: var(--amazon-dark); 
             color: white; 
             padding: 10px 20px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: space-between; 
-            gap: 25px; 
+        }
+        .amazon-nav-container {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            justify-content: space-between;
+            gap: 15px;
         }
         .amazon-brand { 
             font-family: 'Russo One', sans-serif;
@@ -143,6 +146,7 @@ if ($categorias) {
             display: flex; 
             align-items: center; 
             letter-spacing: 1px;
+            white-space: nowrap;
         }
         .amazon-brand:hover { color: white; }
         .amazon-brand span { color: var(--amazon-yellow); }
@@ -214,6 +218,7 @@ if ($categorias) {
             color: white; 
             padding: 10px 20px; 
             display: flex; 
+            flex-wrap: nowrap;
             gap: 10px; 
             font-size: 0.95rem; 
             overflow-x: auto;
@@ -230,8 +235,9 @@ if ($categorias) {
             border-radius: 20px; 
             background: rgba(0,0,0,0.15);
             transition: background 0.2s, border-color 0.2s;
-            display: flex;
+            display: inline-flex;
             align-items: center;
+            flex-shrink: 0;
         }
         .amazon-subnav a:hover { background: rgba(0,0,0,0.3); border-color: rgba(255,255,255,0.5); }
 
@@ -433,17 +439,19 @@ if ($categorias) {
         @media (max-width: 768px) {
             .products-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; }
             .amazon-nav { padding: 10px 15px; }
-            .amazon-nav > div { 
-                display: grid !important; 
+            .amazon-nav-container { 
+                display: grid; 
                 grid-template-columns: 1fr auto; 
                 grid-template-areas: 
                     "brand actions"
                     "search search"; 
                 gap: 12px; 
                 align-items: center;
+                width: 100%;
             }
-            .amazon-brand { grid-area: brand; font-size: 1.1rem; justify-content: flex-start; text-align: left; }
-            .amazon-actions { grid-area: actions; gap: 5px; }
+            .amazon-brand { grid-area: brand; font-size: 1rem; justify-content: flex-start; text-align: left; white-space: normal; line-height: 1.2; }
+            .amazon-actions { grid-area: actions; gap: 10px; }
+            .amazon-actions a { padding: 5px; }
             .amazon-search { grid-area: search; margin-top: 0; width: 100%; max-width: 100%; }
         }
         @media (max-width: 576px) {
@@ -460,10 +468,9 @@ if ($categorias) {
 </head>
 <body>
 
-<!-- Navegación Superior Estilo Amazon -->
 <nav class="amazon-nav">
-    <div class="d-flex align-items-center w-100 justify-content-between flex-wrap" style="gap: 15px;">
-        <a href="index.php" class="amazon-brand mb-0 text-center w-sm-100">
+    <div class="amazon-nav-container">
+        <a href="index.php" class="amazon-brand">
             <i class="fas fa-gamepad me-2 text-white"></i> PES <span class="ms-1 text-danger">BOLIVIA</span> &nbsp; <span class="text-warning">EDITION</span> &nbsp; <span class="text-success">STORE</span>
         </a>
     
