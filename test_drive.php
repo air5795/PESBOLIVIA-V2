@@ -22,20 +22,28 @@ if (class_exists('Google\Client')) {
     echo "<p style='color:red;'>❌ ERROR: La librería de Google no está en la carpeta vendor. ¿Ejecutaste composer require?</p>";
 }
 
-// 3. Probar conexión
+// 3. Probar conexión y realizar prueba real
 try {
     $drive = new GoogleDriveManager();
-    // Intentaremos listar algo simple para ver si conecta
-    echo "<p>Intentando conectar con Google Drive API...</p>";
+    echo "<p style='color:blue;'>ℹ️ Intentando realizar una prueba real de acceso...</p>";
     
-    // Si llegas aquí, intenta dar acceso a un correo de prueba tuyo
-    // Cambia 'TU_EMAIL@gmail.com' por uno tuyo para probar
-    // Y 'ID_DE_TU_CARPETA' por el ID de tu carpeta de Drive
-    /*
-    $resultado = $drive->darAcceso('ID_DE_TU_CARPETA', 'TU_EMAIL@gmail.com');
-    if ($resultado) echo "✅ Prueba de acceso exitosa.";
-    else echo "❌ Falló la prueba de acceso.";
-    */
+    // --- CONFIGURA ESTO PARA TU PRUEBA ---
+    $id_carpeta_prueba = '110TdGC8wa8HitMYZWKfkcvGd8MX3DIUs'; // Tu ID de carpeta
+    $email_prueba = 'air5795@gmail.com'; // Tu email para probar
+    // ------------------------------------
+    
+    echo "Probando carpeta ID: <b>$id_carpeta_prueba</b> con email: <b>$email_prueba</b>...<br>";
+    
+    $resultado = $drive->darAcceso($id_carpeta_prueba, $email_prueba);
+    
+    if ($resultado) {
+        echo "<h2 style='color:green;'>✅ ¡ÉXITO! Se otorgó el acceso correctamente.</h2>";
+        echo "<p>Revisa tu correo ($email_prueba) o intenta entrar a la carpeta ahora.</p>";
+    } else {
+        echo "<h2 style='color:red;'>❌ FALLÓ la prueba de acceso.</h2>";
+        echo "<p>Revisa los logs de error del servidor para ver el detalle técnico.</p>";
+    }
+
 } catch (Exception $e) {
     echo "<p style='color:red;'>❌ ERROR de Conexión: " . $e->getMessage() . "</p>";
 }
