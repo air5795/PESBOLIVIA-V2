@@ -119,7 +119,6 @@ include '../../includes/header.php';
                             <th>Comprador</th>
                             <th>Mi %</th>
                             <th>Mi Ganancia</th>
-                            <th>Mi Ganancia</th>
                             <th>Estado</th>
                             <th>Acciones</th>
                         </tr>
@@ -137,7 +136,6 @@ include '../../includes/header.php';
                             <td>
                                 <span class="badge bg-info"><?php echo number_format($venta['porcentaje'], 2); ?>%</span>
                             </td>
-                            <td>
                             <td>
                                 <strong class="text-success"><?php echo formatear_monto(($venta['monto_total'] * $venta['porcentaje']) / 100); ?></strong>
                             </td>
