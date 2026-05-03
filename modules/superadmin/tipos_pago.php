@@ -12,12 +12,18 @@ $success = $_SESSION['success'] ?? '';
 $error = $_SESSION['error'] ?? '';
 unset($_SESSION['success'], $_SESSION['error']);
 
-// Obtener tipos de pago con información del editor
+// Obtener tipos de pago creados por el administrador actual
+$id_admin = Session::get_user_id();
 $query = "SELECT tp.*, u.nombre as editor_nombre, u.apellido as editor_apellido, u.usuario as editor_usuario 
           FROM tipos_pago tp 
           LEFT JOIN usuarios u ON tp.id_editor = u.id 
+          WHERE tp.id_editor = ?
           ORDER BY tp.id ASC";
-$tipos_pago = mysqli_query($conexion, $query);
+$stmt = mysqli_prepare($conexion, $query);
+mysqli_stmt_bind_param($stmt, "i", $id_admin);
+mysqli_stmt_execute($stmt);
+$tipos_pago = mysqli_stmt_get_result($stmt);
+mysqli_stmt_close($stmt);
 
 include '../../includes/header.php';
 ?>

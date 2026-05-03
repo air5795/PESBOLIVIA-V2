@@ -15,18 +15,22 @@ $filtro_tipo = isset($_GET['tipo']) ? $_GET['tipo'] : 'todos'; // todos, pago, g
 $busqueda = isset($_GET['buscar']) ? limpiar_texto($_GET['buscar']) : '';
 $orden = isset($_GET['orden']) ? $_GET['orden'] : 'ultimos';
 
+$id_usuario_actual = Session::get_user_id() ?? 0;
+
 $query = "SELECT p.*, c.nombre as categoria_nombre, 
           COALESCE(AVG(r.calificacion), 0) as promedio_resenas, 
           COUNT(r.id) as total_resenas,
-          COALESCE(u.usuario, (SELECT usuario FROM usuarios WHERE rol='superadmin' LIMIT 1)) as editor_nombre
+          u.usuario as editor_nombre,
+          (SELECT COUNT(*) FROM producto_editores pe2 WHERE pe2.id_producto = p.id AND pe2.id_editor = $id_usuario_actual) as es_mi_producto
           FROM productos p
           LEFT JOIN categorias c ON p.id_categoria = c.id
           LEFT JOIN resenas r ON p.id = r.id_producto
           LEFT JOIN (
-              SELECT id_producto, MAX(id_editor) as id_editor 
+              SELECT id_producto, MIN(id) as first_pe_id 
               FROM producto_editores 
               GROUP BY id_producto
-          ) pe ON p.id = pe.id_producto
+          ) pe_first ON p.id = pe_first.id_producto
+          LEFT JOIN producto_editores pe ON pe_first.first_pe_id = pe.id
           LEFT JOIN usuarios u ON pe.id_editor = u.id
           WHERE p.estado = 'activo'";
 
@@ -632,17 +636,16 @@ if (!empty($url_params))
         endif; ?>
                     </div>
                     
-                    <?php if ($is_free): ?>
+                    <?php if ($producto['es_mi_producto'] > 0): ?>
+                        <button class="amz-btn text-white opacity-75" style="background: #ccc; border: none; cursor: not-allowed;" disabled>Tu Producto</button>
+                    <?php elseif ($is_free): ?>
                         <a href="producto.php?id=<?php echo $producto['id']; ?>" class="amz-btn text-white" style="background: linear-gradient(135deg, #a855f7 0%, #8b5cf6 100%); border: none;">Ver Info y Descargar</a>
-                    <?php
-        else: ?>
+                    <?php else: ?>
                         <?php if ($is_logged): ?>
-                            <a href="producto.php?id=<?php echo $producto['id']; ?>" class="amz-btn text-white">Agregar a la Cesta</a>
-                        <?php
-            else: ?>
-                            <a href="login.php" class="amz-btn amz-btn-free">Inicia Sesión para comprar</a>
-                        <?php
-            endif; ?>
+                            <a href="producto.php?id=<?php echo $producto['id']; ?>" class="amz-btn text-white">Ver Detalles</a>
+                        <?php else: ?>
+                            <a href="login.php" class="amz-btn amz-btn-free">Inicia Sesión</a>
+                        <?php endif; ?>
                     <?php
         endif; ?>
                 </div>
