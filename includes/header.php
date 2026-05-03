@@ -342,43 +342,46 @@ $menu_items = [];
 
 if ($usuario_rol === ROL_SUPERADMIN) {
     $menu_items = [
+        ['type' => 'header', 'text' => 'GESTIÓN DEL NEGOCIO'],
         ['icon' => 'fa-home', 'text' => 'Dashboard', 'url' => 'dashboard.php'],
-        ['icon' => 'fa-store', 'text' => 'Tienda', 'url' => '../../tienda.php'],
+        ['icon' => 'fa-receipt', 'text' => 'Ventas del Sitio', 'url' => 'compras.php'],
+        ['icon' => 'fa-box', 'text' => 'Productos', 'url' => 'productos.php'],
+        ['icon' => 'fa-th-large', 'text' => 'Categorías', 'url' => 'categorias.php'],
         ['icon' => 'fa-users', 'text' => 'Usuarios', 'url' => 'usuarios.php'],
         ['icon' => 'fa-user-check', 'text' => 'Solicitudes Editor', 'url' => 'solicitudes_editor.php'],
-        ['icon' => 'fa-th-large', 'text' => 'Categorías', 'url' => 'categorias.php'],
-        ['icon' => 'fa-box', 'text' => 'Productos', 'url' => 'productos.php'],
-        ['icon' => 'fa-credit-card', 'text' => 'Tipos de Pago', 'url' => 'tipos_pago.php'],
-        ['icon' => 'fa-receipt', 'text' => 'Ventas del Sitio', 'url' => 'compras.php'],
-        ['icon' => 'fa-shopping-bag', 'text' => 'Mis Compras', 'url' => 'mis_compras.php'],
-        ['icon' => 'fa-chart-line', 'text' => 'Reportes', 'url' => 'reportes.php'],
         ['icon' => 'fa-money-bill-wave', 'text' => 'Comisiones', 'url' => 'comisiones.php'],
+        ['icon' => 'fa-credit-card', 'text' => 'Tipos de Pago', 'url' => 'tipos_pago.php'],
+        ['icon' => 'fa-chart-line', 'text' => 'Reportes', 'url' => 'reportes.php'],
         ['icon' => 'fa-cog', 'text' => 'Ajustes', 'url' => 'ajustes.php'],
+        
+        ['type' => 'header', 'text' => 'ÁREA PERSONAL'],
+        ['icon' => 'fa-shopping-bag', 'text' => 'Mis Compras', 'url' => 'mis_compras.php'],
+        ['icon' => 'fa-store', 'text' => 'Ver Tienda', 'url' => '../../tienda.php'],
     ];
 }
 elseif ($usuario_rol === ROL_EDITOR) {
     $menu_items = [
+        ['type' => 'header', 'text' => 'MI NEGOCIO'],
         ['icon' => 'fa-home', 'text' => 'Dashboard', 'url' => 'dashboard.php'],
-        ['icon' => 'fa-store', 'text' => 'Tienda', 'url' => '../../tienda.php'],
+        ['icon' => 'fa-shopping-cart', 'text' => 'Mis Ventas', 'url' => 'ventas.php'],
         ['icon' => 'fa-box', 'text' => 'Mis Productos', 'url' => 'productos.php'],
         ['icon' => 'fa-credit-card', 'text' => 'Métodos de Pago', 'url' => 'tipos_pago.php'],
-        ['icon' => 'fa-shopping-bag', 'text' => 'Mis Compras', 'url' => 'compras.php'],
-        ['icon' => 'fa-shopping-cart', 'text' => 'Mis Ventas', 'url' => 'ventas.php'],
         ['icon' => 'fa-money-bill-wave', 'text' => 'Mis Comisiones', 'url' => 'mis_comisiones.php'],
-    ];
-}
-else {
-    $menu_items = [
-        ['icon' => 'fa-home', 'text' => 'Dashboard', 'url' => 'dashboard.php'],
-        ['icon' => 'fa-store', 'text' => 'Tienda', 'url' => '../../tienda.php'],
-        ['icon' => 'fa-shopping-bag', 'text' => 'Mis Compras', 'url' => 'mis_compras.php'],
-        ['icon' => 'fa-download', 'text' => 'Descargas', 'url' => 'descargas.php'],
+        
+        ['type' => 'header', 'text' => 'ÁREA PERSONAL'],
+        ['icon' => 'fa-shopping-bag', 'text' => 'Mis Compras', 'url' => 'compras.php'],
+        ['icon' => 'fa-store', 'text' => 'Ver Tienda', 'url' => '../../tienda.php'],
     ];
 }
 
 $current_page = basename($_SERVER['PHP_SELF']);
 
 foreach ($menu_items as $item) {
+    if (isset($item['type']) && $item['type'] === 'header') {
+        echo "<li class='menu-header' style='padding: 15px 20px 5px; font-size: 0.7rem; color: rgba(255,255,255,0.4); font-weight: 700; text-transform: uppercase; letter-spacing: 1px;'>{$item['text']}</li>";
+        continue;
+    }
+    
     $active = ($current_page === $item['url']) ? 'active' : '';
     echo "<li>";
     echo "<a href='{$item['url']}' class='$active'>";
