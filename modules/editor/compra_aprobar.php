@@ -68,6 +68,29 @@ if (mysqli_stmt_execute($stmt)) {
 
     mysqli_stmt_close($stmt_editores);
 
+    // --- AUTOMATIZACIÓN GOOGLE DRIVE (Solo si el producto es del Admin ID 1) ---
+    $query_check_admin_prod = "SELECT id_editor FROM producto_editores WHERE id_producto = ? AND id_editor = 1";
+    $stmt_admin_prod = mysqli_prepare($conexion, $query_check_admin_prod);
+    mysqli_stmt_bind_param($stmt_admin_prod, "i", $compra['id_producto']);
+    mysqli_stmt_execute($stmt_admin_prod);
+    $res_admin_prod = mysqli_stmt_get_result($stmt_admin_prod);
+    $is_admin_owned = mysqli_num_rows($res_admin_prod) > 0;
+    mysqli_stmt_close($stmt_admin_prod);
+
+    if ($is_admin_owned && !empty($compra['drive_link'])) {
+        try {
+            require_once '../../utils/GoogleDriveManager.php';
+            $driveManager = new GoogleDriveManager();
+            $driveManager->darAcceso($compra['drive_link'], $compra['comprador_email']);
+            
+            // Log de respaldo
+            $log_msg = "[" . date('Y-m-d H:i:s') . "] Editor aprobó producto de Admin. Acceso otorgado a " . $compra['comprador_email'] . "\n";
+            file_put_contents('../../logs/automation.log', $log_msg, FILE_APPEND);
+        } catch (Exception $e) {
+            error_log("Error en automatización de Drive (Editor): " . $e->getMessage());
+        }
+    }
+
     // Enviar email de aprobación al comprador
     try {
         $emailSender = new EmailSender();
