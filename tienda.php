@@ -197,36 +197,43 @@ if ($categorias) {
             color: white; 
             text-decoration: none; 
             display: flex; 
-            flex-direction: column; 
+            align-items: center;
             font-size: 0.8rem; 
             line-height: 1.2; 
             padding: 5px 8px;
             border: 1px solid transparent;
-            border-radius: 2px;
-            transition: border-color 0.2s;
+            border-radius: 4px;
+            transition: border-color 0.2s, background-color 0.2s;
         }
-        .amazon-actions a:hover { border-color: rgba(255,255,255,0.7); }
+        .amazon-actions a:hover { border-color: rgba(255,255,255,0.7); background: rgba(255,255,255,0.1); }
         .amazon-actions a span.fw-bold { font-size: 0.95rem; }
 
-        /* Submenú / Categorías rápidas */
+        /* Submenú / Categorías rápidas (Barra Verde) */
         .amazon-subnav { 
             background-color: #198754; 
             color: white; 
-            padding: 8px 20px; 
+            padding: 10px 20px; 
             display: flex; 
-            gap: 15px; 
+            gap: 10px; 
             font-size: 0.95rem; 
             overflow-x: auto;
             white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none; /* Firefox */
         }
+        .amazon-subnav::-webkit-scrollbar { display: none; /* Safari/Chrome */ }
         .amazon-subnav a { 
             color: white; 
             text-decoration: none; 
-            padding: 4px 8px; 
+            padding: 6px 14px; 
             border: 1px solid transparent; 
-            border-radius: 2px; 
+            border-radius: 20px; 
+            background: rgba(0,0,0,0.15);
+            transition: background 0.2s, border-color 0.2s;
+            display: flex;
+            align-items: center;
         }
-        .amazon-subnav a:hover { border-color: white; }
+        .amazon-subnav a:hover { background: rgba(0,0,0,0.3); border-color: rgba(255,255,255,0.5); }
 
         /* Estructura Principal */
         .main-wrapper { 
@@ -425,14 +432,19 @@ if ($categorias) {
         }
         @media (max-width: 768px) {
             .products-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; }
-            .amazon-nav { flex-wrap: wrap; justify-content: space-between; }
-            .amazon-search { order: 3; width: 100%; max-width: 100%; margin-top: 10px; }
-            .amazon-actions { gap: 10px; }
-            .amazon-actions a { font-size: 0.75rem; padding: 2px; }
-            .amazon-actions a span.fw-bold { font-size: 0.85rem; }
-            .amazon-brand { font-size: 1rem; width: 100%; text-align: center; justify-content: center; margin-bottom: 5px; }
-            .amazon-nav { flex-direction: column; align-items: stretch; }
-            .amazon-nav > div { display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: wrap; gap: 10px;}
+            .amazon-nav { padding: 10px 15px; }
+            .amazon-nav > div { 
+                display: grid !important; 
+                grid-template-columns: 1fr auto; 
+                grid-template-areas: 
+                    "brand actions"
+                    "search search"; 
+                gap: 12px; 
+                align-items: center;
+            }
+            .amazon-brand { grid-area: brand; font-size: 1.1rem; justify-content: flex-start; text-align: left; }
+            .amazon-actions { grid-area: actions; gap: 5px; }
+            .amazon-search { grid-area: search; margin-top: 0; width: 100%; max-width: 100%; }
         }
         @media (max-width: 576px) {
             .products-grid { grid-template-columns: 1fr; }
@@ -476,32 +488,42 @@ endif; ?>
     <div class="amazon-actions">
         <?php if ($is_logged): ?>
             <a href="modules/<?php echo $user_role; ?>/dashboard.php">
-                <span>Hola, <?php echo htmlspecialchars($_SESSION['usuario_nombre'] ?? 'Usuario'); ?></span>
-                <span class="fw-bold">Cuenta y Panel</span>
+                <i class="far fa-user d-block d-md-none fs-5"></i>
+                <div class="d-none d-md-flex flex-column">
+                    <span>Hola, <?php echo htmlspecialchars($_SESSION['usuario_nombre'] ?? 'Usuario'); ?></span>
+                    <span class="fw-bold">Cuenta</span>
+                </div>
             </a>
             <?php if ($user_role === ROL_COMPRADOR): ?>
                 <a href="modules/comprador/mis_compras.php">
-                    <span>Devoluciones</span>
-                    <span class="fw-bold">y Pedidos</span>
+                    <i class="fas fa-box d-block d-md-none fs-5"></i>
+                    <div class="d-none d-md-flex flex-column">
+                        <span>Devoluciones</span>
+                        <span class="fw-bold">y Pedidos</span>
+                    </div>
                 </a>
-            <?php
-    endif; ?>
-            <a href="logout.php">
-                <span>Sesión</span>
-                <span class="fw-bold text-danger">Cerrar</span>
+            <?php endif; ?>
+            <a href="logout.php" title="Cerrar sesión">
+                <i class="fas fa-sign-out-alt d-block d-md-none fs-5 text-danger"></i>
+                <div class="d-none d-md-flex flex-column">
+                    <span>Sesión</span>
+                    <span class="fw-bold text-danger">Cerrar</span>
+                </div>
             </a>
-        <?php
-else: ?>
+        <?php else: ?>
             <a href="login.php">
-                <span>Hola, Invitado</span>
-                <span class="fw-bold">Ingresar</span>
+                <i class="far fa-user d-block d-md-none fs-5"></i>
+                <div class="d-none d-md-flex flex-column">
+                    <span>Hola, Invitado</span>
+                    <span class="fw-bold">Ingresar</span>
+                </div>
+                <span class="d-block d-md-none fw-bold ms-2" style="font-size:0.9rem;">Ingresar</span>
             </a>
-            <a href="registro.php" class="d-none d-sm-flex">
+            <a href="registro.php" class="d-none d-md-flex flex-column">
                 <span>¿Eres nuevo?</span>
                 <span class="fw-bold">Empieza aquí.</span>
             </a>
-        <?php
-endif; ?>
+        <?php endif; ?>
     </div>
     </div>
 </nav>
