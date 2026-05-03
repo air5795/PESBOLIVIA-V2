@@ -91,17 +91,23 @@ if ($accion === 'aprobar') {
     mysqli_stmt_close($stmt_owner);
 
     if ($is_superadmin_product && !empty($compra['drive_link'])) {
-        error_log("AUTOMATIZACIÓN: Intentando dar acceso a " . $compra['comprador_email'] . " para la carpeta " . $compra['drive_link']);
+        $log_msg = "[" . date('Y-m-d H:i:s') . "] Intentando dar acceso a " . $compra['comprador_email'] . " para la carpeta " . $compra['drive_link'] . "\n";
+        file_put_contents(BASE_PATH . '/logs/automation.log', $log_msg, FILE_APPEND);
+        
         try {
             require_once BASE_PATH . '/utils/GoogleDriveManager.php';
             $driveManager = new GoogleDriveManager();
             $resultado_drive = $driveManager->darAcceso($compra['drive_link'], $compra['comprador_email']);
-            error_log("AUTOMATIZACIÓN: Resultado de darAcceso: " . ($resultado_drive ? "EXITO" : "FALLO"));
+            
+            $log_res = "[" . date('Y-m-d H:i:s') . "] Resultado de darAcceso: " . ($resultado_drive ? "EXITO" : "FALLO") . "\n";
+            file_put_contents(BASE_PATH . '/logs/automation.log', $log_res, FILE_APPEND);
         } catch (Exception $e) {
-            error_log("Error en automatización de Drive: " . $e->getMessage());
+            $log_err = "[" . date('Y-m-d H:i:s') . "] ERROR: " . $e->getMessage() . "\n";
+            file_put_contents(BASE_PATH . '/logs/automation.log', $log_err, FILE_APPEND);
         }
     } else {
-        error_log("AUTOMATIZACIÓN: Saltada. Superadmin: " . ($is_superadmin_product ? 'SI' : 'NO') . " - Link: " . ($compra['drive_link'] ? 'SI' : 'NO'));
+        $log_skip = "[" . date('Y-m-d H:i:s') . "] Saltada. Superadmin: " . ($is_superadmin_product ? 'SI' : 'NO') . " - Link: " . ($compra['drive_link'] ? 'SI' : 'NO') . "\n";
+        file_put_contents(BASE_PATH . '/logs/automation.log', $log_skip, FILE_APPEND);
     }
 
     // Enviar email de aprobación

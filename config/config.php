@@ -35,6 +35,7 @@ define('COMPROBANTES_PATH', UPLOADS_PATH . '/comprobantes');
 define('IMAGENES_PATH', UPLOADS_PATH . '/imagenes');
 define('PERFILES_PATH', UPLOADS_PATH . '/perfiles');
 define('QR_PATH', UPLOADS_PATH . '/qr');
+define('LOGS_PATH', BASE_PATH . '/logs');
 
 // URL base del sistema
 if (ENTORNO == 'local') {
@@ -128,7 +129,8 @@ $carpetas = [
     COMPROBANTES_PATH,
     IMAGENES_PATH,
     PERFILES_PATH,
-    QR_PATH
+    QR_PATH,
+    LOGS_PATH
 ];
 
 foreach ($carpetas as $carpeta) {
