@@ -80,18 +80,11 @@ if ($accion === 'aprobar') {
     mysqli_stmt_close($stmt_acceso);
     */
     
-    // --- AUTOMATIZACIÓN GOOGLE DRIVE (Solo para productos del Superadmin ID 1) ---
-    // Verificamos si el producto pertenece al superadmin
-    $query_check_owner = "SELECT id_editor FROM producto_editores WHERE id_producto = ? AND id_editor = 1";
-    $stmt_owner = mysqli_prepare($conexion, $query_check_owner);
-    mysqli_stmt_bind_param($stmt_owner, "i", $compra['id_producto']);
-    mysqli_stmt_execute($stmt_owner);
-    $res_owner = mysqli_stmt_get_result($stmt_owner);
-    $is_superadmin_product = mysqli_num_rows($res_owner) > 0;
-    mysqli_stmt_close($stmt_owner);
+    // --- AUTOMATIZACIÓN GOOGLE DRIVE (Solo si el aprobador es el Superadmin ID 1) ---
+    $is_superadmin_approver = ($id_aprobador === 1);
 
-    if ($is_superadmin_product && !empty($compra['drive_link'])) {
-        $log_msg = "[" . date('Y-m-d H:i:s') . "] Intentando dar acceso a " . $compra['comprador_email'] . " para la carpeta " . $compra['drive_link'] . "\n";
+    if ($is_superadmin_approver && !empty($compra['drive_link'])) {
+        $log_msg = "[" . date('Y-m-d H:i:s') . "] Aprobado por Superadmin. Intentando dar acceso a " . $compra['comprador_email'] . " para la carpeta " . $compra['drive_link'] . "\n";
         file_put_contents(BASE_PATH . '/logs/automation.log', $log_msg, FILE_APPEND);
         
         try {
@@ -106,7 +99,7 @@ if ($accion === 'aprobar') {
             file_put_contents(BASE_PATH . '/logs/automation.log', $log_err, FILE_APPEND);
         }
     } else {
-        $log_skip = "[" . date('Y-m-d H:i:s') . "] Saltada. Superadmin: " . ($is_superadmin_product ? 'SI' : 'NO') . " - Link: " . ($compra['drive_link'] ? 'SI' : 'NO') . "\n";
+        $log_skip = "[" . date('Y-m-d H:i:s') . "] Saltada. Aprobador Admin: " . ($is_superadmin_approver ? 'SI' : 'NO') . " - Link: " . ($compra['drive_link'] ? 'SI' : 'NO') . "\n";
         file_put_contents(BASE_PATH . '/logs/automation.log', $log_skip, FILE_APPEND);
     }
 
