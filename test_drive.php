@@ -1,4 +1,7 @@
 <?php
+if (function_exists('opcache_reset')) {
+    opcache_reset();
+}
 require_once 'config/config.php';
 require_once 'includes/funciones.php';
 require_once 'utils/GoogleDriveManager.php';
