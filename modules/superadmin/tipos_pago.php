@@ -12,12 +12,12 @@ $success = $_SESSION['success'] ?? '';
 $error = $_SESSION['error'] ?? '';
 unset($_SESSION['success'], $_SESSION['error']);
 
-// Obtener tipos de pago creados por el administrador actual
+// Obtener tipos de pago creados por el administrador o globales (id_editor IS NULL)
 $id_admin = Session::get_user_id();
 $query = "SELECT tp.*, u.nombre as editor_nombre, u.apellido as editor_apellido, u.usuario as editor_usuario 
           FROM tipos_pago tp 
           LEFT JOIN usuarios u ON tp.id_editor = u.id 
-          WHERE tp.id_editor = ?
+          WHERE tp.id_editor = ? OR tp.id_editor IS NULL
           ORDER BY tp.id ASC";
 $stmt = mysqli_prepare($conexion, $query);
 mysqli_stmt_bind_param($stmt, "i", $id_admin);
