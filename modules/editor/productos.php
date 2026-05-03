@@ -73,12 +73,12 @@ include '../../includes/header.php';
                         </div>
                         <div class="col-md-8">
                             <div class="d-flex justify-content-between align-items-start mb-2">
-                                <h5><?php echo $producto['nombre']; ?></h5>
+                                <h5><?php echo htmlspecialchars($producto['nombre']); ?></h5>
                                 <?php echo badge_estado($producto['estado']); ?>
                             </div>
                             
                             <p class="mb-2">
-                                <span class="badge bg-secondary"><?php echo $producto['categoria_nombre']; ?></span>
+                                <span class="badge bg-secondary"><?php echo htmlspecialchars($producto['categoria_nombre']); ?></span>
                             </p>
                             
                             <p class="mb-2">

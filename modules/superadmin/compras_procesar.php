@@ -82,6 +82,7 @@ if ($accion === 'aprobar') {
     
     // --- AUTOMATIZACIÓN GOOGLE DRIVE (Solo si el aprobador es el Superadmin ID 1) ---
     $is_superadmin_approver = ($id_aprobador === 1);
+    $alerta_drive = '';
 
     if ($is_superadmin_approver && !empty($compra['drive_link'])) {
         $log_msg = "[" . date('Y-m-d H:i:s') . "] Aprobado por Superadmin. Intentando dar acceso a " . $compra['comprador_email'] . " para la carpeta " . $compra['drive_link'] . "\n";
@@ -92,11 +93,23 @@ if ($accion === 'aprobar') {
             $driveManager = new GoogleDriveManager();
             $resultado_drive = $driveManager->darAcceso($compra['drive_link'], $compra['comprador_email']);
             
+            if (!$resultado_drive) {
+                $alerta_drive = " <br><strong>⚠️ ADVERTENCIA:</strong> Falló la automatización de Google Drive. Debes dar acceso a <i>{$compra['comprador_email']}</i> manualmente.";
+                // Registrar la observación en la BD
+                $obs_adicional = $observaciones . " | DRIVE FAILED: Acceso manual requerido.";
+                $q_obs = "UPDATE compras SET observaciones = ? WHERE id = ?";
+                $stmt_obs = mysqli_prepare($conexion, $q_obs);
+                mysqli_stmt_bind_param($stmt_obs, "si", $obs_adicional, $id);
+                mysqli_stmt_execute($stmt_obs);
+                mysqli_stmt_close($stmt_obs);
+            }
+
             $log_res = "[" . date('Y-m-d H:i:s') . "] Resultado de darAcceso: " . ($resultado_drive ? "EXITO" : "FALLO") . "\n";
             file_put_contents(BASE_PATH . '/logs/automation.log', $log_res, FILE_APPEND);
         } catch (Exception $e) {
             $log_err = "[" . date('Y-m-d H:i:s') . "] ERROR: " . $e->getMessage() . "\n";
             file_put_contents(BASE_PATH . '/logs/automation.log', $log_err, FILE_APPEND);
+            $alerta_drive = " <br><strong>⚠️ ERROR CRÍTICO:</strong> La API de Drive falló. Da el acceso manualmente.";
         }
     } else {
         $log_skip = "[" . date('Y-m-d H:i:s') . "] Saltada. Aprobador Admin: " . ($is_superadmin_approver ? 'SI' : 'NO') . " - Link: " . ($compra['drive_link'] ? 'SI' : 'NO') . "\n";
@@ -121,7 +134,7 @@ if ($accion === 'aprobar') {
     Session::registrar_actividad($id_aprobador, 'aprobar', 'compras', $id, 
         "Compra aprobada: " . $compra['codigo_compra']);
     
-    $_SESSION['success'] = "Compra aprobada correctamente. Las comisiones han sido calculadas.";
+    $_SESSION['success'] = "Compra aprobada correctamente. Las comisiones han sido calculadas." . $alerta_drive;
     
 } elseif ($accion === 'rechazar') {
     

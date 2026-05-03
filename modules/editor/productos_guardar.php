@@ -118,8 +118,8 @@ if (isset($_FILES['imagen']) && $_FILES['imagen']['error'] === UPLOAD_ERR_OK) {
         $imagen_path = 'uploads/imagenes/' . $resultado['filename'];
 
         // Eliminar imagen anterior si existe
-        if (!empty($imagen_anterior) && file_exists('../../' . $imagen_anterior)) {
-            unlink('../../' . $imagen_anterior);
+        if (!empty($imagen_anterior) && file_exists(BASE_PATH . '/' . $imagen_anterior)) {
+            unlink(BASE_PATH . '/' . $imagen_anterior);
         }
     }
     else {
@@ -187,15 +187,15 @@ else {
     if (mysqli_stmt_execute($stmt)) {
         $nuevo_id = mysqli_insert_id($conexion);
 
-        // Asignar automáticamente al editor con 100% (solo si NO es gratuito)
-        if ($es_gratuito === 'no') {
-            $porcentaje = 100.00;
-            $query_asignar = "INSERT INTO producto_editores (id_producto, id_editor, porcentaje) VALUES (?, ?, ?)";
-            $stmt_asignar = mysqli_prepare($conexion, $query_asignar);
-            mysqli_stmt_bind_param($stmt_asignar, "iid", $nuevo_id, $id_editor, $porcentaje);
-            mysqli_stmt_execute($stmt_asignar);
-            mysqli_stmt_close($stmt_asignar);
+        // Asignar automáticamente al editor con 100% (para mantener la propiedad, sea de pago o gratuito)
+        $porcentaje = 100.00;
+        $query_asignar = "INSERT INTO producto_editores (id_producto, id_editor, porcentaje) VALUES (?, ?, ?)";
+        $stmt_asignar = mysqli_prepare($conexion, $query_asignar);
+        mysqli_stmt_bind_param($stmt_asignar, "iid", $nuevo_id, $id_editor, $porcentaje);
+        mysqli_stmt_execute($stmt_asignar);
+        mysqli_stmt_close($stmt_asignar);
 
+        if ($es_gratuito === 'no') {
             Session::registrar_actividad($id_editor, 'crear', 'productos', $nuevo_id, "Producto creado: $nombre (100% comisión)");
 
             // Redirigir a agregar videos si es tutorial

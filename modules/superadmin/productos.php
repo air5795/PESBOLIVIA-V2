@@ -96,11 +96,11 @@ include '../../includes/header.php';
                             <?php endif; ?>
                         </td>
                         <td>
-                            <strong><?php echo $producto['nombre']; ?></strong>
+                            <strong><?php echo htmlspecialchars($producto['nombre']); ?></strong>
                         </td>
                         <td>
                             <span class="badge bg-secondary">
-                                <?php echo $producto['categoria_nombre'] ?? 'Sin categoría'; ?>
+                                <?php echo htmlspecialchars($producto['categoria_nombre'] ?? 'Sin categoría'); ?>
                             </span>
                         </td>
                         <td><strong><?php echo formatear_monto($producto['precio']); ?></strong></td>
