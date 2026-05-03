@@ -68,6 +68,17 @@ if (mysqli_stmt_execute($stmt)) {
 
     mysqli_stmt_close($stmt_editores);
 
+    // --- AUTOMATIZACIÓN GOOGLE DRIVE ---
+    if (!empty($compra['drive_link'])) {
+        try {
+            require_once '../../utils/GoogleDriveManager.php';
+            $driveManager = new GoogleDriveManager();
+            $driveManager->darAcceso($compra['drive_link'], $compra['comprador_email']);
+        } catch (Exception $e) {
+            error_log("Error en automatización de Drive (Editor): " . $e->getMessage());
+        }
+    }
+
     // Enviar email de aprobación al comprador
     try {
         $emailSender = new EmailSender();

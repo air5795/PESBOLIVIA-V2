@@ -80,6 +80,17 @@ if ($accion === 'aprobar') {
     mysqli_stmt_close($stmt_acceso);
     */
     
+    // --- AUTOMATIZACIÓN GOOGLE DRIVE ---
+    if (!empty($compra['drive_link'])) {
+        try {
+            require_once BASE_PATH . '/utils/GoogleDriveManager.php';
+            $driveManager = new GoogleDriveManager();
+            $driveManager->darAcceso($compra['drive_link'], $compra['comprador_email']);
+        } catch (Exception $e) {
+            error_log("Error en automatización de Drive: " . $e->getMessage());
+        }
+    }
+
     // Enviar email de aprobación
     try {
         $emailSender = new EmailSender();
