@@ -80,8 +80,17 @@ if ($accion === 'aprobar') {
     mysqli_stmt_close($stmt_acceso);
     */
     
-    // --- AUTOMATIZACIÓN GOOGLE DRIVE ---
-    if (!empty($compra['drive_link'])) {
+    // --- AUTOMATIZACIÓN GOOGLE DRIVE (Solo para productos del Superadmin ID 1) ---
+    // Verificamos si el producto pertenece al superadmin
+    $query_check_owner = "SELECT id_editor FROM producto_editores WHERE id_producto = ? AND id_editor = 1";
+    $stmt_owner = mysqli_prepare($conexion, $query_check_owner);
+    mysqli_stmt_bind_param($stmt_owner, "i", $compra['id_producto']);
+    mysqli_stmt_execute($stmt_owner);
+    $res_owner = mysqli_stmt_get_result($stmt_owner);
+    $is_superadmin_product = mysqli_num_rows($res_owner) > 0;
+    mysqli_stmt_close($stmt_owner);
+
+    if ($is_superadmin_product && !empty($compra['drive_link'])) {
         try {
             require_once BASE_PATH . '/utils/GoogleDriveManager.php';
             $driveManager = new GoogleDriveManager();
