@@ -254,7 +254,17 @@ $usuario_data = obtener_usuario($usuario_id);
         }
         .stat-info h3 { font-size: 1.5rem; font-weight: 800; margin: 0; color: #2c3e50; }
         .stat-info p { margin: 0; color: #888; font-size: 0.85rem; font-weight: 500; }
-    </style>le>
+
+        @media (max-width: 576px) {
+            .stat-card, .stat-glass-card { padding: 15px; gap: 12px; }
+            .stat-icon, .stat-icon-wrapper { width: 45px; height: 45px; min-width: 45px; font-size: 1.1rem; border-radius: 12px; margin-right: 0 !important; }
+            .stat-info h3 { font-size: 1.2rem; }
+            .stat-info p { font-size: 0.75rem; }
+            .content-wrapper { padding: 15px; }
+            .card-header { padding: 15px; font-size: 0.95rem; }
+            .card-body { padding: 15px; }
+        }
+    </style>
     
     <?php if (isset($extra_css))
     echo $extra_css; ?>

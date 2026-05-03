@@ -128,8 +128,10 @@ include '../../includes/header.php';
             <div class="stat-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
                 <i class="fas fa-box"></i>
             </div>
-            <h3><?php echo $stats['total_productos']; ?></h3>
-            <p>Mis Productos</p>
+            <div class="stat-info">
+                <h3><?php echo $stats['total_productos']; ?></h3>
+                <p>Mis Productos</p>
+            </div>
         </div>
     </div>
     
@@ -138,8 +140,10 @@ include '../../includes/header.php';
             <div class="stat-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white;">
                 <i class="fas fa-shopping-cart"></i>
             </div>
-            <h3><?php echo $stats['total_ventas']; ?></h3>
-            <p>Ventas Totales</p>
+            <div class="stat-info">
+                <h3><?php echo $stats['total_ventas']; ?></h3>
+                <p>Ventas Totales</p>
+            </div>
         </div>
     </div>
     
@@ -148,8 +152,10 @@ include '../../includes/header.php';
             <div class="stat-icon" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: white;">
                 <i class="fas fa-clock"></i>
             </div>
-            <h3><?php echo formatear_monto($stats['comisiones_pendientes']); ?></h3>
-            <p>Comisiones Pendientes</p>
+            <div class="stat-info">
+                <h3><?php echo formatear_monto($stats['comisiones_pendientes']); ?></h3>
+                <p>Comisiones Pendientes</p>
+            </div>
         </div>
     </div>
     
@@ -158,8 +164,10 @@ include '../../includes/header.php';
             <div class="stat-icon" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: white;">
                 <i class="fas fa-check-circle"></i>
             </div>
-            <h3><?php echo formatear_monto($stats['comisiones_pagadas']); ?></h3>
-            <p>Comisiones Pagadas</p>
+            <div class="stat-info">
+                <h3><?php echo formatear_monto($stats['comisiones_pagadas']); ?></h3>
+                <p>Comisiones Pagadas</p>
+            </div>
         </div>
     </div>
 </div>
