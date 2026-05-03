@@ -140,16 +140,18 @@ if ($categorias) {
         .amazon-brand { 
             font-family: 'Russo One', sans-serif;
             color: white; 
-            font-size: 1.6rem; 
+            font-size: 1.5rem; 
             font-weight: 400; 
             text-decoration: none; 
             display: flex; 
             align-items: center; 
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
             white-space: nowrap;
+            transition: opacity 0.2s;
         }
-        .amazon-brand:hover { color: white; }
-        .amazon-brand span { color: var(--amazon-yellow); }
+        .amazon-brand:hover { color: #f2f2f2; opacity: 0.9; }
+        .amazon-brand span.edition { color: var(--amazon-yellow); }
+        .amazon-brand span.store { color: #ffffff; background: #dc3545; padding: 0 5px; border-radius: 3px; margin-left: 5px; font-size: 0.8em; }
         
         /* Barra de Búsqueda */
         .amazon-search { 
@@ -212,34 +214,35 @@ if ($categorias) {
         .amazon-actions a:hover { border-color: rgba(255,255,255,0.7); background: rgba(255,255,255,0.1); }
         .amazon-actions a span.fw-bold { font-size: 0.95rem; }
 
-        /* Submenú / Categorías rápidas (Barra Verde) */
         .amazon-subnav { 
             background-color: #198754; 
             color: white; 
-            padding: 10px 20px; 
+            padding: 8px 15px; 
             display: flex; 
             flex-wrap: nowrap;
-            gap: 10px; 
-            font-size: 0.95rem; 
+            gap: 8px; 
+            font-size: 0.9rem; 
             overflow-x: auto;
             white-space: nowrap;
             -webkit-overflow-scrolling: touch;
-            scrollbar-width: none; /* Firefox */
+            scrollbar-width: none;
+            box-shadow: inset 0 -2px 5px rgba(0,0,0,0.1);
         }
-        .amazon-subnav::-webkit-scrollbar { display: none; /* Safari/Chrome */ }
+        .amazon-subnav::-webkit-scrollbar { display: none; }
         .amazon-subnav a { 
             color: white; 
             text-decoration: none; 
-            padding: 6px 14px; 
+            padding: 6px 12px; 
             border: 1px solid transparent; 
             border-radius: 20px; 
-            background: rgba(0,0,0,0.15);
-            transition: background 0.2s, border-color 0.2s;
+            background: rgba(255,255,255,0.1);
+            transition: all 0.2s;
             display: inline-flex;
             align-items: center;
             flex-shrink: 0;
+            font-weight: 500;
         }
-        .amazon-subnav a:hover { background: rgba(0,0,0,0.3); border-color: rgba(255,255,255,0.5); }
+        .amazon-subnav a:hover { background: rgba(255,255,255,0.25); border-color: rgba(255,255,255,0.4); }
 
         /* Estructura Principal */
         .main-wrapper { 
@@ -437,22 +440,30 @@ if ($categorias) {
             .amazon-brand { font-size: 1.2rem; }
         }
         @media (max-width: 768px) {
-            .products-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; }
-            .amazon-nav { padding: 10px 15px; }
+            .products-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
+            .amazon-nav { padding: 8px 12px; }
             .amazon-nav-container { 
                 display: grid; 
                 grid-template-columns: 1fr auto; 
                 grid-template-areas: 
                     "brand actions"
                     "search search"; 
-                gap: 12px; 
+                gap: 10px; 
                 align-items: center;
                 width: 100%;
             }
-            .amazon-brand { grid-area: brand; font-size: 1rem; justify-content: flex-start; text-align: left; white-space: normal; line-height: 1.2; }
-            .amazon-actions { grid-area: actions; gap: 10px; }
-            .amazon-actions a { padding: 5px; }
-            .amazon-search { grid-area: search; margin-top: 0; width: 100%; max-width: 100%; }
+            .amazon-brand { 
+                grid-area: brand; 
+                font-size: 0.9rem; 
+                white-space: normal; 
+                line-height: 1.1; 
+                max-width: 200px;
+            }
+            .amazon-brand span.edition { display: none; } /* Hide edition on mobile to save space */
+            .amazon-actions { grid-area: actions; gap: 6px; justify-content: flex-end; }
+            .amazon-actions a { padding: 4px; }
+            .amazon-search { grid-area: search; margin-top: 2px; width: 100%; height: 38px; }
+            .amazon-search input { font-size: 0.9rem; }
         }
         @media (max-width: 576px) {
             .products-grid { grid-template-columns: 1fr; }
@@ -471,7 +482,7 @@ if ($categorias) {
 <nav class="amazon-nav">
     <div class="amazon-nav-container">
         <a href="index.php" class="amazon-brand">
-            <i class="fas fa-gamepad me-2 text-white"></i> PES <span class="ms-1 text-danger">BOLIVIA</span> &nbsp; <span class="text-warning">EDITION</span> &nbsp; <span class="text-success">STORE</span>
+            <i class="fas fa-gamepad me-1 text-white"></i> PES <span class="ms-1 text-danger">BOLIVIA</span> &nbsp; <span class="edition text-warning">EDITION</span> &nbsp; <span class="store">STORE</span>
         </a>
     
     <form method="GET" action="tienda.php" class="amazon-search">
