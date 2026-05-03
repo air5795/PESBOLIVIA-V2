@@ -90,6 +90,11 @@ class FileValidator {
         // Ruta completa
         $ruta_destino = $carpeta_destino . '/' . $nombre_archivo;
         
+        // Crear carpeta de destino si no existe
+        if (!is_dir($carpeta_destino)) {
+            mkdir($carpeta_destino, 0755, true);
+        }
+        
         // Mover archivo
         if (move_uploaded_file($archivo['tmp_name'], $ruta_destino)) {
             return [
