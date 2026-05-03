@@ -268,14 +268,16 @@ if ($categorias) {
         .filter-list a.active { font-weight: 700; color: var(--amazon-dark); }
 
         /* Área de Productos */
-        .products-content { flex-grow: 1; min-width: 0; }
+        .products-content { flex-grow: 1; min-width: 0; width: 100%; }
         .products-header { 
             background: white; 
-            padding: 15px 25px; 
+            padding: 15px 20px; 
             border-radius: 12px; 
             margin-bottom: 25px; 
             box-shadow: 0 4px 15px rgba(0,0,0,0.02); 
             display: flex; 
+            flex-wrap: wrap;
+            gap: 15px;
             border: 1px solid var(--amz-border);
             justify-content: space-between; 
             align-items: center; 
@@ -284,7 +286,7 @@ if ($categorias) {
         /* Grid de Productos */
         .products-grid { 
             display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); 
             gap: 20px; 
         }
 
@@ -415,22 +417,32 @@ if ($categorias) {
         /* Responsive */
         @media (max-width: 991px) {
             .main-wrapper { flex-direction: column; }
-            .sidebar-filters { width: 100%; display: flex; gap: 30px; flex-wrap: wrap; }
-            .sidebar-filters > div { flex: 1; min-width: 200px; }
+            .sidebar-filters { width: 100%; display: flex; flex-direction: row; gap: 20px; flex-wrap: wrap; padding: 15px; }
+            .sidebar-filters > ul, .sidebar-filters > h5 { flex: 1; min-width: 200px; width: 100%; }
             .amazon-search select { display: none; }
             .amazon-nav { padding: 10px; gap: 15px; }
             .amazon-brand { font-size: 1.2rem; }
         }
         @media (max-width: 768px) {
+            .products-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; }
             .amazon-nav { flex-wrap: wrap; justify-content: space-between; }
             .amazon-search { order: 3; width: 100%; max-width: 100%; margin-top: 10px; }
             .amazon-actions { gap: 10px; }
             .amazon-actions a { font-size: 0.75rem; padding: 2px; }
             .amazon-actions a span.fw-bold { font-size: 0.85rem; }
             .amazon-brand { font-size: 1rem; width: 100%; text-align: center; justify-content: center; margin-bottom: 5px; }
-            /* Mostrar actions arriba o dejarlos en flex-end */
             .amazon-nav { flex-direction: column; align-items: stretch; }
-            .amazon-nav > div { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+            .amazon-nav > div { display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: wrap; gap: 10px;}
+        }
+        @media (max-width: 576px) {
+            .products-grid { grid-template-columns: 1fr; }
+            .products-header { flex-direction: column; align-items: stretch; text-align: center; }
+            .products-header > div { width: 100%; margin-bottom: 5px; }
+            .custom-select-mobile { width: 100% !important; display: block !important; margin-top: 10px; }
+            .amazon-subnav { padding: 8px 10px; font-size: 0.85rem; }
+            .amz-img-wrapper { height: 200px; }
+            .sidebar-filters { flex-direction: column; padding: 15px; gap: 10px; }
+            .sidebar-filters > h5, .sidebar-filters > ul { min-width: 100%; }
         }
     </style>
 </head>
@@ -551,7 +563,7 @@ $base_url = 'tienda.php?' . http_build_query($url_params);
 if (!empty($url_params))
     $base_url .= '&';
 ?>
-                <select class="form-select form-select-sm d-inline-block w-auto" style="border-radius: 8px; border-color: #D5D9D9; background-color: #F0F2F2; box-shadow: 0 2px 5px rgba(15,17,17,.15);" onchange="window.location.href='<?php echo $base_url; ?>orden='+this.value;">
+                <select class="form-select form-select-sm d-inline-block w-auto custom-select-mobile" style="border-radius: 8px; border-color: #D5D9D9; background-color: #F0F2F2; box-shadow: 0 2px 5px rgba(15,17,17,.15);" onchange="window.location.href='<?php echo $base_url; ?>orden='+this.value;">
                     <option value="ultimos" <?php echo($orden == 'ultimos') ? 'selected' : ''; ?>>Últimos agregados</option>
                     <option value="destacados" <?php echo($orden == 'destacados') ? 'selected' : ''; ?>>Ordenar por: Destacados</option>
                     <option value="precio_asc" <?php echo($orden == 'precio_asc') ? 'selected' : ''; ?>>Precio: De menor a mayor</option>
