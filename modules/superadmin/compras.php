@@ -5,7 +5,7 @@ require_once '../../includes/funciones.php';
 
 Session::require_role(ROL_SUPERADMIN);
 
-$page_title = 'Gestión de Compras';
+$page_title = 'Ventas del Sitio';
 
 // Mensajes
 $success = $_SESSION['success'] ?? '';
@@ -54,9 +54,8 @@ $query_stats = "SELECT
     SUM(CASE WHEN c.estado = 'pendiente' THEN 1 ELSE 0 END) as pendientes,
     SUM(CASE WHEN c.estado = 'aprobado' THEN 1 ELSE 0 END) as aprobados,
     SUM(CASE WHEN c.estado = 'rechazado' THEN 1 ELSE 0 END) as rechazados,
-    SUM(CASE WHEN c.estado IN ('aprobado', 'entregado') AND (pe.id_editor IS NULL OR pe.porcentaje < 100) THEN c.monto_total ELSE 0 END) as total_ventas
-    FROM compras c
-    LEFT JOIN producto_editores pe ON c.id_producto = pe.id_producto";
+    SUM(CASE WHEN c.estado = 'aprobado' THEN c.monto_total ELSE 0 END) as total_ventas
+    FROM compras c";
 $result_stats = mysqli_query($conexion, $query_stats);
 $stats = mysqli_fetch_assoc($result_stats);
 
@@ -83,7 +82,7 @@ endif; ?>
 
 <div class="page-header">
     <div>
-        <h1>Gestión de Compras</h1>
+        <h1>Ventas del Sitio</h1>
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="dashboard.php">Dashboard</a></li>
@@ -131,7 +130,7 @@ endif; ?>
                 <i class="fas fa-dollar-sign"></i>
             </div>
             <h3><?php echo formatear_monto($stats['total_ventas']); ?></h3>
-            <p>Total Ventas</p>
+            <p>Ingresos Totales</p>
         </div>
     </div>
 </div>

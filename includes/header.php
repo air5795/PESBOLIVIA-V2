@@ -349,7 +349,7 @@ if ($usuario_rol === ROL_SUPERADMIN) {
         ['icon' => 'fa-th-large', 'text' => 'Categorías', 'url' => 'categorias.php'],
         ['icon' => 'fa-box', 'text' => 'Productos', 'url' => 'productos.php'],
         ['icon' => 'fa-credit-card', 'text' => 'Tipos de Pago', 'url' => 'tipos_pago.php'],
-        ['icon' => 'fa-shopping-cart', 'text' => 'Compras', 'url' => 'compras.php'],
+        ['icon' => 'fa-receipt', 'text' => 'Ventas del Sitio', 'url' => 'compras.php'],
         ['icon' => 'fa-chart-line', 'text' => 'Reportes', 'url' => 'reportes.php'],
         ['icon' => 'fa-money-bill-wave', 'text' => 'Comisiones', 'url' => 'comisiones.php'],
         ['icon' => 'fa-cog', 'text' => 'Ajustes', 'url' => 'ajustes.php'],
@@ -361,8 +361,8 @@ elseif ($usuario_rol === ROL_EDITOR) {
         ['icon' => 'fa-store', 'text' => 'Tienda', 'url' => '../../tienda.php'],
         ['icon' => 'fa-box', 'text' => 'Mis Productos', 'url' => 'productos.php'],
         ['icon' => 'fa-credit-card', 'text' => 'Métodos de Pago', 'url' => 'tipos_pago.php'],
-        ['icon' => 'fa-shopping-bag', 'text' => 'Compras', 'url' => 'compras.php'],
-        ['icon' => 'fa-shopping-cart', 'text' => 'Ventas', 'url' => 'ventas.php'],
+        ['icon' => 'fa-shopping-bag', 'text' => 'Mis Compras', 'url' => 'compras.php'],
+        ['icon' => 'fa-shopping-cart', 'text' => 'Mis Ventas', 'url' => 'ventas.php'],
         ['icon' => 'fa-money-bill-wave', 'text' => 'Mis Comisiones', 'url' => 'mis_comisiones.php'],
     ];
 }
