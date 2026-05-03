@@ -140,6 +140,9 @@ include '../../includes/header.php';
                                 <strong class="text-success"><?php echo formatear_monto(($venta['monto_total'] * $venta['porcentaje']) / 100); ?></strong>
                             </td>
                             <td>
+                                <?php echo badge_estado($venta['estado']); ?>
+                            </td>
+                            <td>
                                 <?php if ($venta['estado'] === 'pendiente'): ?>
                                     <div class="btn-group btn-group-sm">
                                         <?php if (!empty($venta['comprobante'])): ?>
