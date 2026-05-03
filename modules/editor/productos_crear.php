@@ -24,10 +24,10 @@ include '../../includes/header.php';
 ?>
 
 <?php if (mysqli_num_rows($metodos_pago) === 0): ?>
-<div class="alert alert-warning">
-    <i class="fas fa-exclamation-triangle me-2"></i>
-    <strong>¡Atención!</strong> No tienes métodos de pago configurados. 
-    <a href="tipos_pago_crear.php" class="alert-link">Crea uno aquí</a> para productos de pago.
+<div class="alert alert-danger">
+    <i class="fas fa-exclamation-lock me-2"></i>
+    <strong>Función Bloqueada:</strong> No puedes crear productos de pago porque no tienes métodos de pago configurados. 
+    Solo puedes crear productos gratuitos hasta que <a href="tipos_pago_crear.php" class="alert-link">agregues un método de pago aquí</a>.
 </div>
 <?php
 endif; ?>
@@ -250,6 +250,19 @@ function toggleTipoProducto() {
     }
     
     // Precio
+    const tieneMetodos = <?php echo (mysqli_num_rows($metodos_pago) > 0) ? 'true' : 'false'; ?>;
+    const selectGratuito = document.getElementById('esGratuito');
+
+    if (!tieneMetodos) {
+        selectGratuito.value = 'si';
+        // Deshabilitar la opción 'no'
+        for (let i = 0; i < selectGratuito.options.length; i++) {
+            if (selectGratuito.options[i].value === 'no') {
+                selectGratuito.options[i].disabled = true;
+            }
+        }
+    }
+
     if (esGratuito === 'si') {
         campoPrecio.style.display = 'none';
         inputPrecio.required = false;
@@ -261,6 +274,9 @@ function toggleTipoProducto() {
         if (campoMetodoPago) campoMetodoPago.style.display = 'block';
     }
 }
+
+// Ejecutar al cargar
+toggleTipoProducto();
 </script>
 ";
 

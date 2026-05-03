@@ -39,7 +39,19 @@ if (!in_array($es_gratuito, ['si', 'no']))
     $errores[] = "Tipo de producto no válido";
 
 if ($es_gratuito === 'no') {
-    // Producto de pago
+    // Producto de pago - Validar que tenga métodos de pago activos
+    $query_metodos = "SELECT COUNT(*) as total FROM tipos_pago WHERE id_editor = ? AND estado = 'activo'";
+    $stmt_m = mysqli_prepare($conexion, $query_metodos);
+    mysqli_stmt_bind_param($stmt_m, "i", $id_editor);
+    mysqli_stmt_execute($stmt_m);
+    $res_m = mysqli_stmt_get_result($stmt_m);
+    $data_m = mysqli_fetch_assoc($res_m);
+    mysqli_stmt_close($stmt_m);
+
+    if ($data_m['total'] == 0) {
+        $errores[] = "Debes configurar al menos un método de pago activo para crear productos de pago.";
+    }
+
     if ($precio <= 0)
         $errores[] = "El precio debe ser mayor a 0";
 
