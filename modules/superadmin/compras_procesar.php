@@ -91,13 +91,17 @@ if ($accion === 'aprobar') {
     mysqli_stmt_close($stmt_owner);
 
     if ($is_superadmin_product && !empty($compra['drive_link'])) {
+        error_log("AUTOMATIZACIÓN: Intentando dar acceso a " . $compra['comprador_email'] . " para la carpeta " . $compra['drive_link']);
         try {
             require_once BASE_PATH . '/utils/GoogleDriveManager.php';
             $driveManager = new GoogleDriveManager();
-            $driveManager->darAcceso($compra['drive_link'], $compra['comprador_email']);
+            $resultado_drive = $driveManager->darAcceso($compra['drive_link'], $compra['comprador_email']);
+            error_log("AUTOMATIZACIÓN: Resultado de darAcceso: " . ($resultado_drive ? "EXITO" : "FALLO"));
         } catch (Exception $e) {
             error_log("Error en automatización de Drive: " . $e->getMessage());
         }
+    } else {
+        error_log("AUTOMATIZACIÓN: Saltada. Superadmin: " . ($is_superadmin_product ? 'SI' : 'NO') . " - Link: " . ($compra['drive_link'] ? 'SI' : 'NO'));
     }
 
     // Enviar email de aprobación
