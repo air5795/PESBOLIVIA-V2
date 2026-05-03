@@ -7,6 +7,11 @@
 // Incluir conexión
 require_once __DIR__ . '/conexion.php';
 
+// Incluir Autoloader de Composer (Librerías externas)
+if (file_exists(dirname(__DIR__) . '/vendor/autoload.php')) {
+    require_once dirname(__DIR__) . '/vendor/autoload.php';
+}
+
 // =====================================================
 // CONFIGURACIÓN DE SESIONES
 // =====================================================
