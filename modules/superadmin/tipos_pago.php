@@ -12,8 +12,11 @@ $success = $_SESSION['success'] ?? '';
 $error = $_SESSION['error'] ?? '';
 unset($_SESSION['success'], $_SESSION['error']);
 
-// Obtener tipos de pago
-$query = "SELECT * FROM tipos_pago ORDER BY id ASC";
+// Obtener tipos de pago con información del editor
+$query = "SELECT tp.*, u.nombre as editor_nombre, u.apellido as editor_apellido, u.usuario as editor_usuario 
+          FROM tipos_pago tp 
+          LEFT JOIN usuarios u ON tp.id_editor = u.id 
+          ORDER BY tp.id ASC";
 $tipos_pago = mysqli_query($conexion, $query);
 
 include '../../includes/header.php';
@@ -114,6 +117,15 @@ include '../../includes/header.php';
                             </ul>
                         </div>
                         <?php endif; ?>
+
+                        <div class="mt-3 pt-2 border-top">
+                            <small class="text-muted">
+                                <i class="fas fa-user-tag me-1"></i> Dueño: 
+                                <span class="fw-bold text-primary">
+                                    <?php echo !empty($tipo['editor_nombre']) ? ($tipo['editor_nombre'] . ' ' . $tipo['editor_apellido']) : 'ADMINISTRADOR'; ?>
+                                </span>
+                            </small>
+                        </div>
                         
                         <?php if (!empty($tipo['instrucciones'])): ?>
                         <div class="mt-2">
