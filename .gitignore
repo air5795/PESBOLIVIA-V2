@@ -3,4 +3,3 @@
 .env
 *.log
 config/google-credentials.json
-config/conexion.php

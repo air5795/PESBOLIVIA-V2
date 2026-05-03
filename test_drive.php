@@ -42,12 +42,11 @@ try {
     if ($resultado) {
         echo "<h2 style='color:green;'>✅ ¡ÉXITO! Se otorgó el acceso correctamente.</h2>";
         echo "<p>Revisa tu correo ($email_prueba) o intenta entrar a la carpeta ahora.</p>";
-    } else {
-        echo "<h2 style='color:red;'>❌ FALLÓ la prueba de acceso.</h2>";
-        echo "<p>Revisa los logs de error del servidor para ver el detalle técnico.</p>";
     }
 
 } catch (Exception $e) {
-    echo "<p style='color:red;'>❌ ERROR de Conexión: " . $e->getMessage() . "</p>";
+    echo "<h2 style='color:red;'>❌ FALLÓ la prueba de acceso.</h2>";
+    echo "<p><b>Error de Google:</b> <i style='color:red;'>" . htmlspecialchars($e->getMessage()) . "</i></p>";
+    echo "<p><b>Posible solución:</b> Verifica que hayas compartido la carpeta de Drive con el email de la Cuenta de Servicio como 'Editor'.</p>";
 }
 ?>
