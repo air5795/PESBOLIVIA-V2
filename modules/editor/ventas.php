@@ -142,13 +142,32 @@ include '../../includes/header.php';
                                 <strong class="text-success"><?php echo formatear_monto(($venta['monto_total'] * $venta['porcentaje']) / 100); ?></strong>
                             </td>
                             <td>
-                                <?php echo badge_estado($venta['estado']); ?>
-                            </td>
-                            <td>
-                                <button type="button" class="btn btn-sm btn-primary btn-detalle" 
-                                        data-id="<?php echo $venta['id']; ?>" title="Ver Detalle / Gestionar">
-                                    <i class="fas fa-eye"></i> Gestionar
-                                </button>
+                                <?php if ($venta['estado'] === 'pendiente'): ?>
+                                    <div class="btn-group btn-group-sm">
+                                        <?php if (!empty($venta['comprobante'])): ?>
+                                            <button class="btn btn-info text-white" 
+                                                    onclick="verComprobante('<?php echo BASE_URL . '/' . $venta['comprobante']; ?>')"
+                                                    title="Ver Comprobante">
+                                                <i class="fas fa-file-image"></i>
+                                            </button>
+                                        <?php endif; ?>
+                                        <button class="btn btn-success" 
+                                                onclick="aprobarCompra(<?php echo $venta['id']; ?>, '<?php echo $venta['codigo_compra']; ?>')"
+                                                title="Aprobar">
+                                            <i class="fas fa-check"></i>
+                                        </button>
+                                        <button class="btn btn-danger" 
+                                                onclick="rechazarCompra(<?php echo $venta['id']; ?>, '<?php echo $venta['codigo_compra']; ?>')"
+                                                title="Rechazar">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                <?php else: ?>
+                                    <button type="button" class="btn btn-sm btn-outline-primary btn-detalle" 
+                                            data-id="<?php echo $venta['id']; ?>" title="Ver Detalles">
+                                        <i class="fas fa-eye"></i> Detalles
+                                    </button>
+                                <?php endif; ?>
                             </td>
                         </tr>
                         <?php
