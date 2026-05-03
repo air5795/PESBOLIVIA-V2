@@ -54,8 +54,8 @@ class GoogleDriveManager {
             
             return true;
         } catch (Exception $e) {
-            // Lanzamos la excepción para que el diagnóstico pueda mostrarla
-            throw new Exception($e->getMessage());
+            error_log("Google Drive API Error (darAcceso): " . $e->getMessage());
+            return false;
         }
     }
     
