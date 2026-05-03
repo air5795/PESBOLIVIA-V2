@@ -162,26 +162,32 @@ $page_title = $producto['nombre'];
 
         /* Navbar E-commerce */
         .amazon-nav { 
-            background-color: var(--amazon-); 
+            background-color: var(--amazon-dark); 
             color: white; 
             padding: 10px 20px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: space-between; 
-            gap: 25px; 
+        }
+        .amazon-nav-container {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            justify-content: space-between;
+            gap: 15px;
         }
         .amazon-brand { 
             font-family: 'Russo One', sans-serif;
             color: white; 
-            font-size: 1.6rem; 
+            font-size: 1.5rem; 
             font-weight: 400; 
             text-decoration: none; 
             display: flex; 
             align-items: center; 
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+            transition: opacity 0.2s;
         }
-        .amazon-brand:hover { color: white; }
-        .amazon-brand span { color: var(--amazon-yellow); }
+        .amazon-brand:hover { color: #f2f2f2; opacity: 0.9; }
+        .amazon-brand span.edition { color: var(--amazon-yellow); }
+        .amazon-brand span.store { color: #ffffff; background: #dc3545; padding: 0 5px; border-radius: 3px; margin-left: 5px; font-size: 0.8em; }
         
         /* Barra de Búsqueda */
         .amazon-search { 
@@ -233,36 +239,47 @@ $page_title = $producto['nombre'];
             color: white; 
             text-decoration: none; 
             display: flex; 
-            flex-direction: column; 
+            align-items: center;
             font-size: 0.8rem; 
             line-height: 1.2; 
             padding: 5px 8px;
             border: 1px solid transparent;
-            border-radius: 2px;
-            transition: border-color 0.2s;
+            border-radius: 4px;
+            transition: border-color 0.2s, background-color 0.2s;
         }
-        .amazon-actions a:hover { border-color: rgba(255,255,255,0.7); }
+        .amazon-actions a:hover { border-color: rgba(255,255,255,0.7); background: rgba(255,255,255,0.1); }
         .amazon-actions a span.fw-bold { font-size: 0.95rem; }
 
-        /* Submenú / Categorías rápidas */
+        /* Submenú / Categorías rápidas (Barra Verde) */
         .amazon-subnav { 
             background-color: #198754; 
             color: white; 
-            padding: 8px 20px; 
+            padding: 8px 15px; 
             display: flex; 
-            gap: 15px; 
-            font-size: 0.95rem; 
+            flex-wrap: nowrap;
+            gap: 8px; 
+            font-size: 0.9rem; 
             overflow-x: auto;
             white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            box-shadow: inset 0 -2px 5px rgba(0,0,0,0.1);
         }
+        .amazon-subnav::-webkit-scrollbar { display: none; }
         .amazon-subnav a { 
             color: white; 
             text-decoration: none; 
-            padding: 4px 8px; 
+            padding: 6px 12px; 
             border: 1px solid transparent; 
-            border-radius: 2px; 
+            border-radius: 20px; 
+            background: rgba(255,255,255,0.1);
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            flex-shrink: 0;
+            font-weight: 500;
         }
-        .amazon-subnav a:hover { border-color: white; }
+        .amazon-subnav a:hover { background: rgba(255,255,255,0.25); border-color: rgba(255,255,255,0.4); }
 
         /* Contenedor del Producto */
         .amz-product-container {
@@ -470,22 +487,47 @@ $page_title = $producto['nombre'];
 
         /* Responsive */
         @media (max-width: 991px) {
-            .amz-product-container { flex-direction: column; }
+            .amz-product-container { flex-direction: column; align-items: stretch; }
             .amz-left-col, .amz-mid-col, .amz-right-col { flex: auto; width: 100%; position: static; }
+            .amz-left-col { margin-bottom: 20px; }
+            .amz-img-main { max-width: 400px; }
+            .reviews-container { flex-direction: column; }
+            .reviews-left { flex: auto; border-bottom: 1px solid #eee; padding-bottom: 30px; margin-bottom: 30px; }
             .amazon-search select { display: none; }
             .amazon-nav { padding: 10px; gap: 15px; }
-            .amazon-brand { font-size: 1.2rem; }
         }
         @media (max-width: 768px) {
-            .amazon-nav { flex-wrap: wrap; justify-content: space-between; }
-            .amazon-search { order: 3; width: 100%; max-width: 100%; margin-top: 10px; }
-            .amazon-actions { gap: 10px; }
-            .amazon-actions a { font-size: 0.75rem; padding: 2px; }
-            .amazon-actions a span.fw-bold { font-size: 0.85rem; }
-            .amazon-brand { font-size: 1rem; width: 100%; text-align: center; justify-content: center; margin-bottom: 5px; }
-            /* Mostrar actions arriba o dejarlos en flex-end */
-            .amazon-nav { flex-direction: column; align-items: stretch; }
-            .amazon-nav > div { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+            .amazon-nav { padding: 8px 12px; }
+            .amazon-nav-container { 
+                display: grid; 
+                grid-template-columns: 1fr auto; 
+                grid-template-areas: 
+                    "brand actions"
+                    "search search"; 
+                gap: 10px; 
+                align-items: center;
+                width: 100%;
+            }
+            .amazon-brand { 
+                grid-area: brand; 
+                font-size: 0.9rem; 
+                white-space: normal; 
+                line-height: 1.1; 
+                max-width: 200px;
+            }
+            .amazon-brand span.edition { display: none; }
+            .amazon-actions { grid-area: actions; gap: 6px; justify-content: flex-end; }
+            .amazon-actions a { padding: 4px; }
+            .amazon-search { grid-area: search; margin-top: 2px; width: 100%; height: 38px; }
+            .amazon-search input { font-size: 0.9rem; }
+            
+            .p-title { font-size: 1.3rem; }
+            .p-price { font-size: 1.5rem; }
+            .amz-product-container { padding: 0 15px 30px; gap: 15px; }
+        }
+        @media (max-width: 576px) {
+            .amz-img-main { max-width: 100%; }
+            .amazon-subnav { padding: 8px 10px; font-size: 0.85rem; }
         }
 
         .qr-preview {
@@ -500,10 +542,10 @@ $page_title = $producto['nombre'];
 <body>
 
 <!-- Navegación Superior -->
-<nav class="amazon-nav" style="background-color: var(--amazon-dark);">
-    <div class="d-flex align-items-center w-100 justify-content-between flex-wrap" style="gap: 15px;">
-        <a href="index.php" class="amazon-brand mb-0 text-center w-sm-100">
-            <i class="fas fa-gamepad me-2 text-white"></i> PES <span class="ms-1 text-danger">BOLIVIA</span> &nbsp; <span class="text-warning">EDITION</span> &nbsp; <span class="text-success">STORE</span>
+<nav class="amazon-nav">
+    <div class="amazon-nav-container">
+        <a href="index.php" class="amazon-brand">
+            <i class="fas fa-gamepad me-1 text-white"></i> PES <span class="ms-1 text-danger">BOLIVIA</span> &nbsp; <span class="edition text-warning">EDITION</span> &nbsp; <span class="store">STORE</span>
         </a>
     
     <form method="GET" action="tienda.php" class="amazon-search">
@@ -523,32 +565,43 @@ endforeach; ?>
     <div class="amazon-actions">
         <?php if ($is_logged): ?>
             <a href="modules/<?php echo $user_role; ?>/dashboard.php">
-                <span>Hola, <?php echo htmlspecialchars($_SESSION['usuario_nombre'] ?? 'Usuario'); ?></span>
-                <span class="fw-bold">Cuenta y Panel</span>
+                <i class="far fa-user d-block d-md-none fs-5"></i>
+                <div class="d-none d-md-flex flex-column">
+                    <span>Hola, <?php echo htmlspecialchars($_SESSION['usuario_nombre'] ?? 'Usuario'); ?></span>
+                    <span class="fw-bold">Cuenta</span>
+                </div>
             </a>
             <?php if ($user_role === ROL_COMPRADOR): ?>
                 <a href="modules/comprador/mis_compras.php">
-                    <span>Devoluciones</span>
-                    <span class="fw-bold">y Pedidos</span>
+                    <i class="fas fa-box d-block d-md-none fs-5"></i>
+                    <div class="d-none d-md-flex flex-column">
+                        <span>Devoluciones</span>
+                        <span class="fw-bold">y Pedidos</span>
+                    </div>
                 </a>
-            <?php
-    endif; ?>
-            <a href="logout.php">
-                <span>Sesión</span>
-                <span class="fw-bold text-danger">Cerrar</span>
+            <?php endif; ?>
+            <a href="logout.php" title="Cerrar sesión">
+                <i class="fas fa-sign-out-alt d-block d-md-none fs-5 text-danger"></i>
+                <div class="d-none d-md-flex flex-column">
+                    <span>Sesión</span>
+                    <span class="fw-bold text-danger">Cerrar</span>
+                </div>
             </a>
-        <?php
-else: ?>
+        <?php else: ?>
             <a href="login.php">
-                <span>Hola, Invitado</span>
-                <span class="fw-bold">Ingresar</span>
+                <i class="far fa-user d-block d-md-none fs-5"></i>
+                <div class="d-none d-md-flex flex-column">
+                    <span>Hola, Invitado</span>
+                    <span class="fw-bold">Ingresar</span>
+                </div>
+                <span class="d-block d-md-none fw-bold ms-2" style="font-size:0.9rem;">Ingresar</span>
             </a>
-            <a href="registro.php" class="d-none d-sm-flex">
+            <a href="registro.php" class="d-none d-md-flex flex-column">
                 <span>¿Eres nuevo?</span>
                 <span class="fw-bold">Empieza aquí.</span>
+            </div>
             </a>
-        <?php
-endif; ?>
+        <?php endif; ?>
     </div>
     </div>
 </nav>
