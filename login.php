@@ -99,26 +99,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
     
     <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- SweetAlert2 -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+            --primary-color: #27CCA0;
+            --primary-dark: #1fa87a;
+            --primary-glow: rgba(39, 204, 160, 0.3);
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --surface: #16161f;
+            --surface-alt: #1c1c26;
+            --border: #2a2a3a;
+            --text-primary: #e8e8ec;
+            --text-secondary: #9999a8;
+            --text-muted: #666677;
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.3);
+            --shadow-md: 0 8px 25px rgba(0,0,0,0.4);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-full: 50px;
         }
         
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         body {
-            font-family: 'Poppins', sans-serif;
-            background: #111111;
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg-dark);
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -127,18 +137,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
         }
         
         .login-container {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
             overflow: hidden;
-            max-width: 1000px;
+            max-width: 950px;
             width: 100%;
             display: flex;
+            border: 1px solid var(--border);
         }
         
         .login-left {
-            background: #004d00;
-            color: white;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            color: #0a0a0f;
             padding: 60px 40px;
             flex: 1;
             display: flex;
@@ -149,51 +160,52 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
         }
         
         .login-left h2 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 20px;
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 15px;
         }
         
         .login-left p {
-            font-size: 1.1rem;
+            font-size: 1rem;
             opacity: 0.9;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
         }
         
         .login-left .icon {
-            font-size: 8rem;
+            font-size: 6rem;
             opacity: 0.3;
-            margin-top: 30px;
+            margin-top: 20px;
         }
         
         .login-right {
-            padding: 60px 50px;
+            padding: 50px 45px;
             flex: 1;
+            background: var(--bg-card);
         }
         
         .login-header {
             text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 35px;
         }
         
         .login-header h3 {
-            font-size: 2rem;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 10px;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
         }
         
         .login-header p {
-            color: #666;
+            color: var(--text-secondary);
         }
         
         .form-group {
-            margin-bottom: 25px;
+            margin-bottom: 22px;
         }
         
         .form-group label {
             font-weight: 500;
-            color: #333;
+            color: var(--text-secondary);
             margin-bottom: 8px;
             display: block;
         }
@@ -202,80 +214,53 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
             position: relative;
         }
         
-        .input-group-custom i {
+        .input-group-custom > i:not(.password-toggle i) {
             position: absolute;
             left: 15px;
             top: 50%;
             transform: translateY(-50%);
-            color: #999;
+            color: var(--text-muted);
+            z-index: 1;
         }
         
-        .form-control {
-            padding: 12px 15px 12px 45px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
+        .input-group-custom .form-control {
+            padding: 14px 45px 14px 45px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius-full);
             font-size: 1rem;
+            background: var(--surface);
+            color: var(--text-primary);
             transition: all 0.3s;
         }
         
-        .form-control:focus {
-            border-color: #004d00;
-            box-shadow: 0 0 0 0.2rem rgba(0, 77, 0, 0.1);
+        .input-group-custom .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px var(--primary-glow);
+            background: var(--surface);
+            color: var(--text-primary);
+            outline: none;
+        }
+        
+        .input-group-custom .form-control::placeholder {
+            color: var(--text-muted);
         }
         
         .btn-login {
-            background: #004d00;
-            color: white;
-            padding: 12px;
+            background: var(--primary-color);
+            color: #0a0a0f;
+            padding: 14px;
             border: none;
-            border-radius: 10px;
-            font-weight: 600;
-            font-size: 1.1rem;
+            border-radius: var(--radius-full);
+            font-weight: 700;
+            font-size: 1.05rem;
             width: 100%;
             transition: all 0.3s;
             margin-top: 10px;
         }
         
         .btn-login:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(0, 77, 0, 0.4);
-        }
-        
-        .forgot-password {
-            text-align: center;
-            margin-top: 20px;
-        }
-        
-        .forgot-password a {
-            color: #004d00;
-            text-decoration: none;
-            font-weight: 500;
-            transition: all 0.3s;
-        }
-        
-        .forgot-password a:hover {
-            color: #003300;
-        }
-        
-        .back-home {
-            text-align: center;
-            margin-top: 30px;
-        }
-        
-        .back-home a {
-            color: #666;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            transition: all 0.3s;
-        }
-        
-        .back-home a:hover {
-            color: #004d00;
-        }
-        
-        .back-home i {
-            margin-right: 8px;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px var(--primary-glow);
         }
         
         .password-toggle {
@@ -284,61 +269,77 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
             top: 50%;
             transform: translateY(-50%);
             cursor: pointer;
-            color: #999;
+            color: var(--text-muted);
+            z-index: 2;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            background: transparent;
         }
         
         .password-toggle:hover {
-            color: #004d00;
+            color: var(--primary-color);
+        }
+        
+        .login-links {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            margin-top: 25px;
+        }
+        
+        .login-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s;
+            font-size: 0.95rem;
+        }
+        
+        .login-links a:hover {
+            color: var(--primary-color);
+        }
+        
+        .login-links a.primary-link {
+            color: var(--primary-color);
         }
         
         @media (max-width: 768px) {
             body {
                 padding: 15px;
-                background: linear-gradient(135deg, #111111 0%, #002200 100%);
+                background: var(--bg-dark);
             }
             .login-container {
                 flex-direction: column;
-                border-radius: 15px;
+                border-radius: var(--radius-md);
             }
             .login-left {
                 padding: 30px 20px;
-                flex-direction: column;
-                justify-content: center;
-                align-items: center;
-                text-align: center;
-            }
-            .login-left-text {
-                width: 100%;
             }
             .login-left h2 {
-                font-size: 1.8rem;
-                margin-bottom: 5px;
+                font-size: 1.6rem;
             }
             .login-left p {
-                display: block;
-                font-size: 0.95rem;
-                margin-bottom: 0;
+                font-size: 0.9rem;
             }
             .login-left .icon {
-                display: none; /* Ocultamos el ícono gigante para ahorrar espacio valioso en el cel */
+                display: none;
             }
             .login-right {
-                padding: 35px 20px;
-            }
-            .login-header {
-                margin-bottom: 25px;
+                padding: 30px 20px;
             }
             .login-header h3 {
                 font-size: 1.5rem;
             }
             .form-control {
-                padding: 14px 15px 14px 45px; /* Inputs ligeramente más grandes para touch */
+                padding: 16px 15px 16px 45px;
             }
             .btn-login {
-                padding: 14px;
-            }
-            .d-flex.flex-column.gap-3 {
-                gap: 1.5rem !important; /* Más espacio en botones de abajo para que no haya miss-clicks */
+                padding: 16px;
             }
         }
     </style>
@@ -349,7 +350,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
         <!-- Lado izquierdo -->
         <div class="login-left">
             <div class="login-left-text">
-                <h2><?php echo NOMBRE_SISTEMA; ?></h2>
+                <h2>PES BOLIVIA</h2>
                 <p>Bienvenido de vuelta. Ingresa tus credenciales para acceder a tu cuenta.</p>
             </div>
             <div class="icon">
@@ -372,7 +373,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
                         icon: 'error',
                         title: 'Ups...',
                         text: '<?php echo addslashes($error); ?>',
-                        confirmButtonColor: '#004d00'
+                        confirmButtonColor: '#27CCA0'
                     });
                     <?php endif; ?>
                     
@@ -381,7 +382,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
                         icon: 'success',
                         title: '¡Excelente!',
                         text: '<?php echo addslashes($success); ?>',
-                        confirmButtonColor: '#004d00'
+                        confirmButtonColor: '#27CCA0'
                     });
                     <?php endif; ?>
                 });
@@ -417,30 +418,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
                 </button>
             </form>
             
-            <div class="d-flex flex-column align-items-center gap-3 mt-4">
-                <a href="registro.php" class="text-decoration-none fw-bold" style="color: #004d00; font-size: 1.05rem; transition: color 0.2s;" onmouseover="this.style.color='#006600'" onmouseout="this.style.color='#004d00'">
-                    <i class="fas fa-user-plus me-1"></i> ¿No tienes cuenta? Registrate aquí
+            <div class="login-links">
+                <a href="registro.php" class="primary-link">
+                    <i class="fas fa-user-plus me-1"></i> ¿No tienes cuenta? Regístrate aquí
                 </a>
                 
-                <a href="recuperar_password.php" class="text-decoration-none text-secondary" style="font-size: 0.95rem; font-weight: 500; transition: color 0.2s;" onmouseover="this.style.color='#333'" onmouseout="this.style.color='#6c757d'">
+                <a href="recuperar_password.php">
                     <i class="fas fa-key me-1"></i> ¿Olvidaste tu contraseña?
                 </a>
                 
-                <a href="index.php" class="text-decoration-none text-muted" style="font-size: 0.9rem; transition: color 0.2s;" onmouseover="this.style.color='#004d00'" onmouseout="this.style.color='#6c757d'">
-                    <i class="fas fa-arrow-left me-1"></i> Volver
+                <a href="index.php">
+                    <i class="fas fa-arrow-left me-1"></i> Volver al inicio
                 </a>
             </div>
         </div>
     </div>
 
-    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
     <script>
-        // Toggle password visibility
         function togglePassword() {
             const passwordInput = document.getElementById('password');
             const toggleIcon = document.getElementById('toggleIcon');
@@ -456,7 +453,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
             }
         }
         
-        // Validación del formulario
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             const usuario = document.getElementById('usuario').value.trim();
             const password = document.getElementById('password').value;
@@ -467,7 +463,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
                     icon: 'warning',
                     title: 'Campos vacíos',
                     text: 'Por favor, complete todos los campos',
-                    confirmButtonColor: '#004d00'
+                    confirmButtonColor: '#27CCA0'
                 });
             }
         });
