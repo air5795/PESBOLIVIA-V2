@@ -714,7 +714,7 @@ if ($categorias) {
         }
         .price-currency { font-size: 0.8rem; color: var(--text-secondary); font-weight: 500; }
         .price-amount { font-size: 1.4rem; font-weight: 800; color: var(--primary-color); }
-        .price-usd { font-size: 0.75rem; color: var(--text-muted); margin-left: 4px; }
+        .price-usd { font-size: 0.75rem; color: #b5b5c5; margin-left: 4px; }
 
         /* Botones */
         .btn-product {

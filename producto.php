@@ -508,63 +508,67 @@ $page_title = $producto['nombre'];
             top: 100px;
         }
         .product-main-img { 
-            max-width: 100%; 
-            max-height: 100%; 
-            object-fit: contain; 
-            border-radius: var(--radius-md); 
-            transition: opacity 0.3s ease; 
+            width: auto !important;
+            height: auto !important;
+            max-width: 100% !important; 
+            max-height: 100% !important; 
+            object-fit: contain !important; 
+            border-radius: var(--radius-md) !important; 
+            transition: opacity 0.3s ease !important; 
         }
         .product-placeholder-img {
-            width: 100%;
-            height: 300px;
-            background: linear-gradient(135deg, var(--surface) 0%, var(--surface-alt) 100%);
-            border-radius: var(--radius-md);
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            width: 100% !important;
+            height: 300px !important;
+            background: linear-gradient(135deg, var(--surface) 0%, var(--surface-alt) 100%) !important;
+            border-radius: var(--radius-md) !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
         }
-        .product-placeholder-img i { font-size: 4rem; color: var(--text-muted); }
+        .product-placeholder-img i { font-size: 4rem !important; color: var(--text-muted) !important; }
 
         /* Carrusel de imágenes */
         .product-thumbnails {
-            display: flex;
-            gap: 8px;
-            margin-top: 12px;
-            overflow-x: auto;
-            padding-bottom: 6px;
-            scrollbar-width: thin;
-            scrollbar-color: var(--primary-color) var(--surface);
+            display: flex !important;
+            justify-content: center !important;
+            gap: 8px !important;
+            margin-top: 12px !important;
+            overflow-x: auto !important;
+            padding-bottom: 6px !important;
+            scrollbar-width: thin !important;
+            scrollbar-color: var(--primary-color) var(--surface) !important;
         }
-        .product-thumbnails::-webkit-scrollbar { height: 4px; }
-        .product-thumbnails::-webkit-scrollbar-track { background: var(--surface); border-radius: 2px; }
-        .product-thumbnails::-webkit-scrollbar-thumb { background: var(--primary-color); border-radius: 2px; }
+        .product-thumbnails::-webkit-scrollbar { height: 4px !important; }
+        .product-thumbnails::-webkit-scrollbar-track { background: var(--surface) !important; border-radius: 2px !important; }
+        .product-thumbnails::-webkit-scrollbar-thumb { background: var(--primary-color) !important; border-radius: 2px !important; }
         .product-thumb {
-            width: 70px;
-            height: 70px;
-            min-width: 70px;
-            border-radius: var(--radius-sm);
-            overflow: hidden;
-            cursor: pointer;
-            border: 3px solid var(--border);
-            transition: all 0.3s ease;
-            opacity: 0.6;
+            width: 70px !important;
+            height: 70px !important;
+            min-width: 70px !important;
+            border-radius: var(--radius-sm) !important;
+            overflow: hidden !important;
+            cursor: pointer !important;
+            border: 3px solid var(--border) !important;
+            transition: all 0.3s ease !important;
+            opacity: 0.6 !important;
         }
-        .product-thumb:hover { opacity: 0.9; border-color: var(--text-secondary); }
-        .product-thumb.active { border-color: var(--primary-color); opacity: 1; box-shadow: 0 0 0 2px var(--primary-glow); }
-        .product-thumb img { width: 100%; height: 100%; object-fit: cover; }
+        .product-thumb:hover { opacity: 0.9 !important; border-color: var(--text-secondary) !important; }
+        .product-thumb.active { border-color: var(--primary-color) !important; opacity: 1 !important; box-shadow: 0 0 0 2px var(--primary-glow) !important; }
+        .product-thumb img { width: 100% !important; height: 100% !important; object-fit: cover !important; }
 
         /* Zoom icon overlay */
         .product-img-wrapper { 
-            position: relative; 
-            cursor: zoom-in; 
-            height: 400px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, var(--surface) 0%, var(--surface-alt) 100%);
-            border-radius: var(--radius-md);
-            border: 1px solid var(--border);
-            overflow: hidden;
+            position: relative !important; 
+            cursor: zoom-in !important; 
+            height: 400px !important;
+            width: 100% !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            background: linear-gradient(135deg, var(--surface) 0%, var(--surface-alt) 100%) !important;
+            border-radius: var(--radius-md) !important;
+            border: 1px solid var(--border) !important;
+            overflow: hidden !important;
         }
         .product-img-wrapper .zoom-icon {
             position: absolute; top: 12px; right: 12px;
@@ -634,7 +638,8 @@ $page_title = $producto['nombre'];
         .price-label { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 5px; }
         .price-amount { font-size: 2rem; font-weight: 800; color: var(--primary-color); display: flex; align-items: baseline; }
         .price-currency { font-size: 1rem; color: var(--text-secondary); margin-right: 4px; }
-        .price-usd { font-size: 0.9rem; color: var(--text-muted); margin-left: 10px; font-weight: 500; }
+        .price-usd { font-size: 0.95rem; color: #b5b5c5; margin-left: 10px; font-weight: 500; }
+        .price-usd-box { font-size: 0.95rem; color: #b5b5c5; font-weight: 500; }
         .price-free { font-size: 1.8rem; font-weight: 800; color: var(--primary-color); }
 
         .product-features { margin-top: 20px; }
@@ -984,7 +989,7 @@ else:
     $precio_usd = $producto['precio'] / floatval($CONFIG['tasa_cambio_usd'] ?? 6.96);
 ?>
             <div class="buy-price">Bs. <?php echo number_format($producto['precio'], 2); ?></div>
-            <div class="text-muted mb-3" style="font-size: 0.9rem;">(~$<?php echo number_format($precio_usd, 2); ?> USD)</div>
+            <div class="price-usd-box mb-3">(~$<?php echo number_format($precio_usd, 2); ?> USD)</div>
             
             <div class="stock-status">
                 <i class="fas fa-check-circle"></i> Disponible
