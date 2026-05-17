@@ -74,7 +74,7 @@ $CONFIG = cargar_configuracion();
 define('NOMBRE_SISTEMA', $CONFIG['nombre_sistema'] ?? 'PES BOLIVIA');
 define('EMAIL_SISTEMA', $CONFIG['email_sistema'] ?? 'airpatch@pesbolivia.airsoftbol.com');
 define('MONEDA', $CONFIG['moneda'] ?? 'Bs.');
-define('MAX_UPLOAD_SIZE', $CONFIG['max_upload_size'] ?? 1048576); // 1MB en bytes
+define('MAX_UPLOAD_SIZE', $CONFIG['max_upload_size'] ?? 2097152); // 2MB en bytes
 
 // SMTP
 define('SMTP_HOST', $CONFIG['smtp_host'] ?? 'smtp.titan.email');

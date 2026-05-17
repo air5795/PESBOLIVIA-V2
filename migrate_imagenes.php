@@ -81,6 +81,17 @@ if ($res_tasa && mysqli_num_rows($res_tasa) === 0) {
     echo "✅ Tasa de cambio USD ya configurada.\n";
 }
 
+// 4. Actualizar o insertar max_upload_size para que sea de 2MB (2097152 bytes)
+$check_upload_size = "SELECT id FROM configuracion WHERE clave = 'max_upload_size'";
+$res_upload_size = mysqli_query($conexion, $check_upload_size);
+if ($res_upload_size && mysqli_num_rows($res_upload_size) > 0) {
+    mysqli_query($conexion, "UPDATE configuracion SET valor = '2097152' WHERE clave = 'max_upload_size'");
+    echo "✅ Límite de subida de archivos (max_upload_size) actualizado a 2MB en la base de datos.\n";
+} else {
+    mysqli_query($conexion, "INSERT INTO configuracion (clave, valor) VALUES ('max_upload_size', '2097152')");
+    echo "✅ Límite de subida de archivos (max_upload_size) creado como 2MB en la base de datos.\n";
+}
+
 echo "\n🎉 ¡Migración exitosa! Ahora puedes eliminar este archivo.\n";
 echo "</pre>";
 ?>
