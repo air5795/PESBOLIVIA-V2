@@ -23,6 +23,7 @@ $drive_link = limpiar_texto($_POST['drive_link'] ?? '');
 $link_descarga_directa = limpiar_texto($_POST['link_descarga_directa'] ?? '');
 $estado = limpiar_texto($_POST['estado']);
 $id_editor = Session::get_user_id();
+$imagen_principal_index = intval($_POST['imagen_principal_index'] ?? 0);
 
 $errores = [];
 
@@ -54,14 +55,10 @@ if ($es_gratuito === 'no') {
 
     if ($precio <= 0)
         $errores[] = "El precio debe ser mayor a 0";
-
-    // Solo validar drive_link si NO es tutorial
     if ($tipo_producto === 'normal' && empty($drive_link)) {
         $errores[] = "El link de Google Drive es requerido";
     }
-}
-else {
-    // Producto gratuito
+} else {
     if ($tipo_producto === 'normal' && empty($link_descarga_directa)) {
         $errores[] = "El link de descarga directa es requerido";
     }
@@ -88,12 +85,11 @@ if (!empty($errores)) {
     redirect($id > 0 ? "productos_editar.php?id=$id" : 'productos_crear.php');
 }
 
-// Procesar imagen
+// Procesar imagen principal (compatibilidad)
 $imagen_path = '';
 $imagen_anterior = '';
 
 if ($id > 0) {
-    // Obtener imagen anterior si existe
     $query = "SELECT imagen FROM productos WHERE id = ? AND id IN (SELECT id_producto FROM producto_editores WHERE id_editor = ?)";
     $stmt = mysqli_prepare($conexion, $query);
     mysqli_stmt_bind_param($stmt, "ii", $id, $id_editor);
@@ -105,30 +101,53 @@ if ($id > 0) {
     mysqli_stmt_close($stmt);
 }
 
-// Si hay nueva imagen
-if (isset($_FILES['imagen']) && $_FILES['imagen']['error'] === UPLOAD_ERR_OK) {
+// Procesar múltiples imágenes nuevas
+$nuevas_imagenes = [];
+if (isset($_FILES['imagenes']) && !empty($_FILES['imagenes']['name'][0])) {
+    $total_files = count($_FILES['imagenes']['name']);
+    
     $fileValidator = new FileValidator();
-    $resultado = $fileValidator->guardar_archivo(
-        $_FILES['imagen'],
-        IMAGENES_PATH,
-        'producto_' . time()
-    );
-
-    if ($resultado['success']) {
-        $imagen_path = 'uploads/imagenes/' . $resultado['filename'];
-
-        // Eliminar imagen anterior si existe
-        if (!empty($imagen_anterior) && file_exists(BASE_PATH . '/' . $imagen_anterior)) {
-            unlink(BASE_PATH . '/' . $imagen_anterior);
+    for ($i = 0; $i < $total_files; $i++) {
+        if ($_FILES['imagenes']['error'][$i] === UPLOAD_ERR_OK) {
+            $file = [
+                'name' => $_FILES['imagenes']['name'][$i],
+                'type' => $_FILES['imagenes']['type'][$i],
+                'tmp_name' => $_FILES['imagenes']['tmp_name'][$i],
+                'error' => $_FILES['imagenes']['error'][$i],
+                'size' => $_FILES['imagenes']['size'][$i]
+            ];
+            
+            $resultado = $fileValidator->guardar_archivo(
+                $file,
+                IMAGENES_PATH,
+                'producto_' . time() . '_' . $i
+            );
+            
+            if ($resultado['success']) {
+                $nuevas_imagenes[] = [
+                    'path' => 'uploads/imagenes/' . $resultado['filename'],
+                    'es_principal' => ($i === $imagen_principal_index) ? 1 : 0
+                ];
+            }
         }
     }
-    else {
-        $_SESSION['error'] = implode('<br>', $resultado['errors']);
-        redirect($id > 0 ? "productos_editar.php?id=$id" : 'productos_crear.php');
-    }
 }
-else {
-    // Mantener imagen anterior si está editando
+
+// Determinar imagen principal para productos.imagen
+if (!empty($nuevas_imagenes)) {
+    $found_principal = false;
+    foreach ($nuevas_imagenes as $img) {
+        if ($img['es_principal'] == 1) {
+            $imagen_path = $img['path'];
+            $found_principal = true;
+            break;
+        }
+    }
+    if (!$found_principal) {
+        $imagen_path = $nuevas_imagenes[0]['path'];
+        $nuevas_imagenes[0]['es_principal'] = 1;
+    }
+} else {
     if ($id > 0) {
         $imagen_path = $imagen_anterior;
     }
@@ -156,8 +175,7 @@ if ($id > 0) {
         $stmt = mysqli_prepare($conexion, $query);
         mysqli_stmt_bind_param($stmt, "sissdsssssssi", $nombre, $id_categoria, $descripcion, $es_gratuito, $precio, $id_tipo_pago,
             $version, $requisitos, $drive_link, $link_descarga_directa, $imagen_path, $estado, $id);
-    }
-    else {
+    } else {
         $query = "UPDATE productos SET nombre = ?, id_categoria = ?, descripcion = ?, es_gratuito = ?, precio = ?, 
                   id_tipo_pago = ?, version = ?, requisitos = ?, drive_link = ?, link_descarga_directa = ?, estado = ? 
                   WHERE id = ?";
@@ -167,27 +185,57 @@ if ($id > 0) {
     }
 
     if (mysqli_stmt_execute($stmt)) {
+        // Guardar nuevas imágenes en producto_imagenes
+        if (!empty($nuevas_imagenes)) {
+            foreach ($nuevas_imagenes as $img) {
+                if ($img['es_principal'] == 1) {
+                    $q_reset = "UPDATE producto_imagenes SET es_principal = 0 WHERE id_producto = ?";
+                    $s = mysqli_prepare($conexion, $q_reset);
+                    mysqli_stmt_bind_param($s, "i", $id);
+                    mysqli_stmt_execute($s);
+                    mysqli_stmt_close($s);
+                    break;
+                }
+            }
+            
+            $orden = 0;
+            $q_max = "SELECT MAX(orden) as max_orden FROM producto_imagenes WHERE id_producto = ?";
+            $s = mysqli_prepare($conexion, $q_max);
+            mysqli_stmt_bind_param($s, "i", $id);
+            mysqli_stmt_execute($s);
+            $r = mysqli_stmt_get_result($s);
+            $max = mysqli_fetch_assoc($r);
+            $orden = ($max['max_orden'] ?? 0) + 1;
+            mysqli_stmt_close($s);
+            
+            foreach ($nuevas_imagenes as $img) {
+                $q_insert = "INSERT INTO producto_imagenes (id_producto, imagen, es_principal, orden) VALUES (?, ?, ?, ?)";
+                $s = mysqli_prepare($conexion, $q_insert);
+                mysqli_stmt_bind_param($s, "isii", $id, $img['path'], $img['es_principal'], $orden);
+                mysqli_stmt_execute($s);
+                mysqli_stmt_close($s);
+                $orden++;
+            }
+        }
+        
         Session::registrar_actividad($id_editor, 'actualizar', 'productos', $id, "Producto actualizado: $nombre");
         $_SESSION['success'] = "Producto actualizado correctamente";
-    }
-    else {
+    } else {
         $_SESSION['error'] = "Error al actualizar el producto";
     }
 
-
-}
-else {
+} else {
     // Crear nuevo producto
     $query = "INSERT INTO productos (nombre, id_categoria, descripcion, tipo_producto, es_gratuito, id_tipo_pago, precio, version, requisitos, drive_link, link_descarga_directa, imagen, estado) 
               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     $stmt = mysqli_prepare($conexion, $query);
-    mysqli_stmt_bind_param($stmt, "sissidsssssss", $nombre, $id_categoria, $descripcion, $tipo_producto, $es_gratuito, $id_tipo_pago, $precio,
+    mysqli_stmt_bind_param($stmt, "sissssdssssss", $nombre, $id_categoria, $descripcion, $tipo_producto, $es_gratuito, $id_tipo_pago, $precio,
         $version, $requisitos, $drive_link, $link_descarga_directa, $imagen_path, $estado);
 
     if (mysqli_stmt_execute($stmt)) {
         $nuevo_id = mysqli_insert_id($conexion);
 
-        // Asignar automáticamente al editor con 100% (para mantener la propiedad, sea de pago o gratuito)
+        // Asignar automáticamente al editor con 100%
         $porcentaje = 100.00;
         $query_asignar = "INSERT INTO producto_editores (id_producto, id_editor, porcentaje) VALUES (?, ?, ?)";
         $stmt_asignar = mysqli_prepare($conexion, $query_asignar);
@@ -195,33 +243,41 @@ else {
         mysqli_stmt_execute($stmt_asignar);
         mysqli_stmt_close($stmt_asignar);
 
+        // Guardar imágenes en producto_imagenes
+        if (!empty($nuevas_imagenes)) {
+            $orden = 0;
+            foreach ($nuevas_imagenes as $img) {
+                $q_insert = "INSERT INTO producto_imagenes (id_producto, imagen, es_principal, orden) VALUES (?, ?, ?, ?)";
+                $s = mysqli_prepare($conexion, $q_insert);
+                mysqli_stmt_bind_param($s, "isii", $nuevo_id, $img['path'], $img['es_principal'], $orden);
+                mysqli_stmt_execute($s);
+                mysqli_stmt_close($s);
+                $orden++;
+            }
+        }
+
         if ($es_gratuito === 'no') {
             Session::registrar_actividad($id_editor, 'crear', 'productos', $nuevo_id, "Producto creado: $nombre (100% comisión)");
 
-            // Redirigir a agregar videos si es tutorial
             if ($tipo_producto === 'tutorial') {
                 $_SESSION['success'] = "Tutorial creado correctamente. Ahora agrega los videos.";
                 mysqli_stmt_close($stmt);
                 redirect("tutorial_videos.php?id=$nuevo_id");
-            }
-            else {
+            } else {
                 $_SESSION['success'] = "Producto creado correctamente. Tienes asignado el 100% de comisión.";
             }
-        }
-        else {
+        } else {
             Session::registrar_actividad($id_editor, 'crear', 'productos', $nuevo_id, "Producto gratuito creado: $nombre");
 
             if ($tipo_producto === 'tutorial') {
                 $_SESSION['success'] = "Tutorial gratuito creado. Ahora agrega los videos.";
                 mysqli_stmt_close($stmt);
                 redirect("tutorial_videos.php?id=$nuevo_id");
-            }
-            else {
+            } else {
                 $_SESSION['success'] = "Producto gratuito creado correctamente.";
             }
         }
-    }
-    else {
+    } else {
         $_SESSION['error'] = "Error al crear el producto";
     }
 

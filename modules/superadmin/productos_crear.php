@@ -171,13 +171,13 @@ endwhile; ?>
         <div class="col-lg-4">
             <div class="card mb-4">
                 <div class="card-header">
-                    <h5 class="mb-0">Imagen</h5>
+                    <h5 class="mb-0"><i class="fas fa-images me-2"></i>Imágenes del Producto</h5>
                 </div>
                 <div class="card-body">
-                    <input type="file" class="form-control" name="imagen" accept="image/*" id="inputImagen">
-                    <div id="previewImagen" style="display: none;" class="mt-3">
-                        <img id="imagenPreview" src="" style="width: 100%; border-radius: 8px;">
-                    </div>
+                    <input type="file" class="form-control" name="imagenes[]" accept="image/jpeg,image/png,image/jpg,image/webp" id="inputImagenes" multiple>
+                    <small class="text-muted d-block mt-1"><i class="fas fa-info-circle me-1"></i>Sube múltiples imágenes. Click en una para marcarla como principal.</small>
+                    <input type="hidden" name="imagen_principal_index" id="imagenPrincipalIndex" value="0">
+                    <div id="previewImagenes" class="mt-3 d-flex flex-wrap gap-2"></div>
                 </div>
             </div>
             
@@ -197,16 +197,54 @@ endwhile; ?>
 <?php
 $extra_js = "
 <script>
-document.getElementById('inputImagen').addEventListener('change', function(e) {
-    const file = e.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            document.getElementById('imagenPreview').src = e.target.result;
-            document.getElementById('previewImagen').style.display = 'block';
-        }
-        reader.readAsDataURL(file);
+// Multi-image preview
+document.getElementById('inputImagenes').addEventListener('change', function(e) {
+    const files = e.target.files;
+    const preview = document.getElementById('previewImagenes');
+    preview.innerHTML = '';
+    
+    if (files.length > 20) {
+        alert('Máximo 20 imágenes a la vez');
+        this.value = '';
+        return;
     }
+    
+    Array.from(files).forEach((file, index) => {
+        if (file.size > 1048576) {
+            alert('La imagen ' + file.name + ' supera 1MB');
+            return;
+        }
+        const reader = new FileReader();
+        reader.onload = function(ev) {
+            const wrapper = document.createElement('div');
+            wrapper.style.cssText = 'position:relative;width:100px;height:100px;border-radius:8px;overflow:hidden;cursor:pointer;border:3px solid ' + (index === 0 ? '#27CCA0' : '#dee2e6');
+            wrapper.setAttribute('data-index', index);
+            wrapper.onclick = function() {
+                document.getElementById('imagenPrincipalIndex').value = index;
+                document.querySelectorAll('#previewImagenes > div').forEach(d => d.style.borderColor = '#dee2e6');
+                document.querySelectorAll('#previewImagenes .badge-principal').forEach(b => b.remove());
+                this.style.borderColor = '#27CCA0';
+                const badge = document.createElement('span');
+                badge.className = 'badge-principal';
+                badge.style.cssText = 'position:absolute;bottom:0;left:0;right:0;background:rgba(39,204,160,0.9);color:#000;text-align:center;font-size:0.65rem;padding:2px;font-weight:700;';
+                badge.textContent = 'PRINCIPAL';
+                this.appendChild(badge);
+            };
+            const img = document.createElement('img');
+            img.src = ev.target.result;
+            img.style.cssText = 'width:100%;height:100%;object-fit:cover;';
+            wrapper.appendChild(img);
+            if (index === 0) {
+                const badge = document.createElement('span');
+                badge.className = 'badge-principal';
+                badge.style.cssText = 'position:absolute;bottom:0;left:0;right:0;background:rgba(39,204,160,0.9);color:#000;text-align:center;font-size:0.65rem;padding:2px;font-weight:700;';
+                badge.textContent = 'PRINCIPAL';
+                wrapper.appendChild(badge);
+            }
+            preview.appendChild(wrapper);
+        };
+        reader.readAsDataURL(file);
+    });
 });
 
 function toggleTipoProducto() {
@@ -221,7 +259,6 @@ function toggleTipoProducto() {
     const inputDrive = document.getElementById('inputDrive');
     const inputDescargaDirecta = document.getElementById('inputDescargaDirecta');
     
-    // Mostrar alerta tutorial
     if (tipoProducto === 'tutorial') {
         alertaTutorial.style.display = 'block';
         campoDrive.style.display = 'none';
@@ -243,7 +280,6 @@ function toggleTipoProducto() {
         }
     }
     
-    // Precio
     if (esGratuito === 'si') {
         campoPrecio.style.display = 'none';
         inputPrecio.required = false;

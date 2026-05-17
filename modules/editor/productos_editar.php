@@ -45,6 +45,18 @@ mysqli_stmt_close($stmt_metodos);
 // Métodos seleccionados
 $metodos_seleccionados = explode(',', $producto['id_tipo_pago'] ?? '');
 
+// Obtener imágenes del producto
+$query_imagenes = "SELECT * FROM producto_imagenes WHERE id_producto = ? ORDER BY es_principal DESC, orden ASC";
+$stmt_img = mysqli_prepare($conexion, $query_imagenes);
+mysqli_stmt_bind_param($stmt_img, "i", $id);
+mysqli_stmt_execute($stmt_img);
+$imagenes_producto = mysqli_stmt_get_result($stmt_img);
+$imagenes_array = [];
+while ($img = mysqli_fetch_assoc($imagenes_producto)) {
+    $imagenes_array[] = $img;
+}
+mysqli_stmt_close($stmt_img);
+
 include '../../includes/header.php';
 ?>
 
@@ -183,31 +195,43 @@ endwhile; ?>
         <div class="col-lg-4">
             <div class="card mb-4">
                 <div class="card-header">
-                    <h5 class="mb-0">Imagen del Producto</h5>
+                    <h5 class="mb-0"><i class="fas fa-images me-2"></i>Imágenes del Producto</h5>
                 </div>
                 <div class="card-body">
-                    <?php if (!empty($producto['imagen']) && file_exists('../../' . $producto['imagen'])): ?>
-                        <div class="mb-3">
-                            <img src="<?php echo BASE_URL . '/' . $producto['imagen']; ?>" 
-                                 alt="Imagen actual" 
-                                 style="width: 100%; border-radius: 8px;">
-                            <small class="text-muted d-block mt-2">Imagen actual</small>
+                    <!-- Imágenes existentes -->
+                    <?php if (!empty($imagenes_array)): ?>
+                    <label class="form-label fw-bold mb-2">Imágenes actuales (<?php echo count($imagenes_array); ?>)</label>
+                    <div class="d-flex flex-wrap gap-2 mb-3" id="imagenesExistentes">
+                        <?php foreach ($imagenes_array as $img): ?>
+                        <div class="position-relative" id="img-container-<?php echo $img['id']; ?>" style="width:100px;height:100px;border-radius:8px;overflow:hidden;border:3px solid <?php echo $img['es_principal'] ? '#27CCA0' : '#dee2e6'; ?>;">
+                            <img src="<?php echo BASE_URL . '/' . $img['imagen']; ?>" style="width:100%;height:100%;object-fit:cover;">
+                            <?php if ($img['es_principal']): ?>
+                            <span style="position:absolute;bottom:0;left:0;right:0;background:rgba(39,204,160,0.9);color:#000;text-align:center;font-size:0.65rem;padding:2px;font-weight:700;">PRINCIPAL</span>
+                            <?php endif; ?>
+                            <button type="button" onclick="eliminarImagen(<?php echo $img['id']; ?>)" class="btn btn-sm" style="position:absolute;top:2px;right:2px;background:rgba(220,53,69,0.9);color:#fff;border:none;border-radius:50%;width:22px;height:22px;padding:0;font-size:0.7rem;line-height:22px;">
+                                <i class="fas fa-times"></i>
+                            </button>
+                            <?php if (!$img['es_principal']): ?>
+                            <button type="button" onclick="hacerPrincipal(<?php echo $img['id']; ?>)" class="btn btn-sm" style="position:absolute;top:2px;left:2px;background:rgba(39,204,160,0.9);color:#000;border:none;border-radius:50%;width:22px;height:22px;padding:0;font-size:0.7rem;line-height:22px;" title="Hacer principal">
+                                <i class="fas fa-star"></i>
+                            </button>
+                            <?php endif; ?>
                         </div>
-                    <?php
-endif; ?>
+                        <?php endforeach; ?>
+                    </div>
+                    <?php endif; ?>
                     
+                    <!-- Agregar nuevas imágenes -->
                     <div class="mb-3">
-                        <label class="form-label">Cambiar Imagen</label>
-                        <input type="file" class="form-control" name="imagen" 
+                        <label class="form-label">Agregar más imágenes</label>
+                        <input type="file" class="form-control" name="imagenes[]" 
                                accept="image/jpeg,image/png,image/jpg,image/webp" 
-                               id="inputImagen">
-                        <small class="text-muted">Deja vacío para mantener la imagen actual</small>
+                               id="inputImagenes" multiple>
+                        <small class="text-muted">Selecciona imágenes adicionales</small>
+                        <input type="hidden" name="imagen_principal_index" id="imagenPrincipalIndex" value="-1">
                     </div>
                     
-                    <div id="previewImagen" style="display: none;">
-                        <img id="imagenPreview" src="" alt="Preview" 
-                             style="width: 100%; border-radius: 8px;">
-                    </div>
+                    <div id="previewImagenes" class="d-flex flex-wrap gap-2"></div>
                 </div>
             </div>
             
@@ -233,23 +257,85 @@ endif; ?>
 
 $extra_js = "
 <script>
-document.getElementById('inputImagen').addEventListener('change', function(e) {
-    const file = e.target.files[0];
-    if (file) {
+// Multi-image preview for new images
+document.getElementById('inputImagenes').addEventListener('change', function(e) {
+    const files = e.target.files;
+    const preview = document.getElementById('previewImagenes');
+    preview.innerHTML = '';
+    const maxNew = 20;
+    
+    if (files.length > maxNew) {
+        alert('Solo puedes agregar ' + maxNew + ' imágenes más');
+        this.value = '';
+        return;
+    }
+    
+    Array.from(files).forEach((file, index) => {
         if (file.size > 1048576) {
-            mostrarAlerta('warning', 'Archivo muy grande', 'La imagen no debe superar 1MB');
-            this.value = '';
+            alert('La imagen ' + file.name + ' supera 1MB');
             return;
         }
-        
         const reader = new FileReader();
-        reader.onload = function(e) {
-            document.getElementById('imagenPreview').src = e.target.result;
-            document.getElementById('previewImagen').style.display = 'block';
-        }
+        reader.onload = function(ev) {
+            const wrapper = document.createElement('div');
+            wrapper.style.cssText = 'position:relative;width:100px;height:100px;border-radius:8px;overflow:hidden;cursor:pointer;border:3px solid #dee2e6;';
+            const img = document.createElement('img');
+            img.src = ev.target.result;
+            img.style.cssText = 'width:100%;height:100%;object-fit:cover;';
+            wrapper.appendChild(img);
+            wrapper.onclick = function() {
+                document.getElementById('imagenPrincipalIndex').value = index;
+                document.querySelectorAll('#previewImagenes > div').forEach(d => d.style.borderColor = '#dee2e6');
+                document.querySelectorAll('#previewImagenes .badge-p').forEach(b => b.remove());
+                this.style.borderColor = '#27CCA0';
+                const badge = document.createElement('span');
+                badge.className = 'badge-p';
+                badge.style.cssText = 'position:absolute;bottom:0;left:0;right:0;background:rgba(39,204,160,0.9);color:#000;text-align:center;font-size:0.65rem;padding:2px;font-weight:700;';
+                badge.textContent = 'PRINCIPAL';
+                this.appendChild(badge);
+            };
+            preview.appendChild(wrapper);
+        };
         reader.readAsDataURL(file);
-    }
+    });
 });
+
+function eliminarImagen(idImagen) {
+    if (!confirm('¿Eliminar esta imagen?')) return;
+    
+    fetch('" . BASE_URL . "/ajax/eliminar_imagen_producto.php', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: 'id_imagen=' + idImagen
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            document.getElementById('img-container-' + idImagen).remove();
+            location.reload();
+        } else {
+            alert(data.message);
+        }
+    })
+    .catch(err => alert('Error de conexión'));
+}
+
+function hacerPrincipal(idImagen) {
+    fetch('" . BASE_URL . "/ajax/cambiar_imagen_principal.php', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: 'id_imagen=' + idImagen
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert(data.message);
+        }
+    })
+    .catch(err => alert('Error de conexión'));
+}
 </script>
 <script>
 function toggleTipoProducto() {
@@ -263,7 +349,6 @@ function toggleTipoProducto() {
     const inputDrive = document.getElementById('inputDrive');
     const inputDescargaDirecta = document.getElementById('inputDescargaDirecta');
     
-    // Tutorial overrides
     if (tipoProducto === 'tutorial') {
         campoDrive.style.display = 'none';
         inputDrive.required = false;
@@ -283,7 +368,6 @@ function toggleTipoProducto() {
         }
     }
     
-    // Precio
     if (esGratuito === 'si') {
         campoPrecio.style.display = 'none';
         inputPrecio.required = false;

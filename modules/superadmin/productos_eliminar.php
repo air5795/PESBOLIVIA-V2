@@ -50,10 +50,24 @@ if ($producto = mysqli_fetch_assoc($result)) {
     mysqli_stmt_bind_param($stmt_delete, "i", $id);
     
     if (mysqli_stmt_execute($stmt_delete)) {
-        // Eliminar imagen si existe
+        // Eliminar imagen principal si existe
         if (!empty($producto['imagen']) && file_exists('../../' . $producto['imagen'])) {
             unlink('../../' . $producto['imagen']);
         }
+        
+        // Eliminar todas las imágenes de producto_imagenes (archivos físicos)
+        $query_imgs = "SELECT imagen FROM producto_imagenes WHERE id_producto = ?";
+        $stmt_imgs = mysqli_prepare($conexion, $query_imgs);
+        mysqli_stmt_bind_param($stmt_imgs, "i", $id);
+        mysqli_stmt_execute($stmt_imgs);
+        $result_imgs = mysqli_stmt_get_result($stmt_imgs);
+        while ($img_row = mysqli_fetch_assoc($result_imgs)) {
+            if (!empty($img_row['imagen']) && $img_row['imagen'] !== $producto['imagen'] && file_exists('../../' . $img_row['imagen'])) {
+                unlink('../../' . $img_row['imagen']);
+            }
+        }
+        mysqli_stmt_close($stmt_imgs);
+        // Los registros de producto_imagenes se eliminan por CASCADE
         
         Session::registrar_actividad(Session::get_user_id(), 'eliminar', 'productos', $id, "Producto eliminado: " . $producto['nombre']);
         $_SESSION['success'] = "Producto eliminado correctamente";

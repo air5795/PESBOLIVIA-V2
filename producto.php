@@ -38,6 +38,18 @@ if (!$producto = mysqli_fetch_assoc($result)) {
 }
 mysqli_stmt_close($stmt);
 
+// Obtener todas las imágenes del producto
+$query_imagenes = "SELECT * FROM producto_imagenes WHERE id_producto = ? ORDER BY es_principal DESC, orden ASC";
+$stmt_img = mysqli_prepare($conexion, $query_imagenes);
+mysqli_stmt_bind_param($stmt_img, "i", $id_producto);
+mysqli_stmt_execute($stmt_img);
+$result_imgs = mysqli_stmt_get_result($stmt_img);
+$imagenes_producto = [];
+while ($img_row = mysqli_fetch_assoc($result_imgs)) {
+    $imagenes_producto[] = $img_row;
+}
+mysqli_stmt_close($stmt_img);
+
 // Verificar si ya compró este producto (solo si logueado)
 $ya_comprado = false;
 if ($is_logged) {
@@ -55,12 +67,10 @@ if ($is_logged) {
 // Obtener tipos de pago
 $tipos_pago = null;
 if (!empty($producto['id_tipo_pago'])) {
-    $query_tipos = "SELECT * FROM tipos_pago WHERE FIND_IN_SET(id, ?) > 0 AND estado = 'activo'";
-    $stmt = mysqli_prepare($conexion, $query_tipos);
-    mysqli_stmt_bind_param($stmt, "s", $producto['id_tipo_pago']);
-    mysqli_stmt_execute($stmt);
-    $tipos_pago = mysqli_stmt_get_result($stmt);
-    mysqli_stmt_close($stmt);
+    $ids_pago = array_map('intval', explode(',', $producto['id_tipo_pago']));
+    $ids_pago_str = implode(',', $ids_pago);
+    $query_tipos = "SELECT * FROM tipos_pago WHERE id IN ($ids_pago_str) AND estado = 'activo' ORDER BY id ASC";
+    $tipos_pago = mysqli_query($conexion, $query_tipos);
 }
 else {
     $query_editor = "SELECT id_editor FROM producto_editores WHERE id_producto = ? ORDER BY porcentaje DESC LIMIT 1";
@@ -497,7 +507,7 @@ $page_title = $producto['nombre'];
             position: sticky;
             top: 100px;
         }
-        .product-main-img { width: 100%; border-radius: var(--radius-md); object-fit: contain; }
+        .product-main-img { width: 100%; border-radius: var(--radius-md); object-fit: contain; max-height: 400px; transition: opacity 0.3s ease; }
         .product-placeholder-img {
             width: 100%;
             height: 300px;
@@ -508,6 +518,83 @@ $page_title = $producto['nombre'];
             justify-content: center;
         }
         .product-placeholder-img i { font-size: 4rem; color: var(--text-muted); }
+
+        /* Carrusel de imágenes */
+        .product-thumbnails {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+            overflow-x: auto;
+            padding-bottom: 6px;
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary-color) var(--surface);
+        }
+        .product-thumbnails::-webkit-scrollbar { height: 4px; }
+        .product-thumbnails::-webkit-scrollbar-track { background: var(--surface); border-radius: 2px; }
+        .product-thumbnails::-webkit-scrollbar-thumb { background: var(--primary-color); border-radius: 2px; }
+        .product-thumb {
+            width: 70px;
+            height: 70px;
+            min-width: 70px;
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            cursor: pointer;
+            border: 3px solid var(--border);
+            transition: all 0.3s ease;
+            opacity: 0.6;
+        }
+        .product-thumb:hover { opacity: 0.9; border-color: var(--text-secondary); }
+        .product-thumb.active { border-color: var(--primary-color); opacity: 1; box-shadow: 0 0 0 2px var(--primary-glow); }
+        .product-thumb img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* Zoom icon overlay */
+        .product-img-wrapper { position: relative; cursor: zoom-in; }
+        .product-img-wrapper .zoom-icon {
+            position: absolute; top: 12px; right: 12px;
+            background: rgba(0,0,0,0.55); color: #fff;
+            width: 36px; height: 36px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.95rem; opacity: 0; transition: opacity 0.3s;
+            pointer-events: none;
+        }
+        .product-img-wrapper:hover .zoom-icon { opacity: 1; }
+
+        /* Lightbox */
+        .lightbox-overlay {
+            display: none; position: fixed; inset: 0; z-index: 9999;
+            background: rgba(0,0,0,0.92); backdrop-filter: blur(6px);
+            align-items: center; justify-content: center;
+        }
+        .lightbox-overlay.active { display: flex; }
+        .lightbox-close {
+            position: absolute; top: 20px; right: 28px;
+            background: none; border: none; color: #fff;
+            font-size: 2rem; cursor: pointer; z-index: 10;
+            transition: transform 0.2s;
+        }
+        .lightbox-close:hover { transform: scale(1.2); }
+        .lightbox-img {
+            max-width: 90vw; max-height: 85vh;
+            border-radius: 8px; object-fit: contain;
+            box-shadow: 0 0 60px rgba(0,0,0,0.5);
+            transition: opacity 0.25s;
+        }
+        .lightbox-arrow {
+            position: absolute; top: 50%; transform: translateY(-50%);
+            background: rgba(255,255,255,0.12); border: none; color: #fff;
+            width: 50px; height: 50px; border-radius: 50%;
+            font-size: 1.3rem; cursor: pointer; z-index: 10;
+            display: flex; align-items: center; justify-content: center;
+            transition: background 0.2s;
+        }
+        .lightbox-arrow:hover { background: rgba(255,255,255,0.25); }
+        .lightbox-arrow.left { left: 20px; }
+        .lightbox-arrow.right { right: 20px; }
+        .lightbox-counter {
+            position: absolute; bottom: 24px; left: 50%;
+            transform: translateX(-50%); color: rgba(255,255,255,0.7);
+            font-size: 0.85rem; font-weight: 600;
+        }
 
         .product-details-col {
             background: var(--bg-card);
@@ -766,10 +853,35 @@ function toggleMobileMenu() {
 </div>
 
 <div class="product-container">
-    <!-- Columna Izquierda: Imagen -->
+    <!-- Columna Izquierda: Imagen con Carrusel -->
     <div class="product-image-col">
-        <?php if (!empty($producto['imagen']) && file_exists($producto['imagen'])): ?>
-            <img src="<?php echo BASE_URL . '/' . $producto['imagen']; ?>" alt="<?php echo htmlspecialchars($producto['nombre']); ?>" class="product-main-img">
+        <?php if (!empty($imagenes_producto)): ?>
+            <?php
+                $img_principal = $imagenes_producto[0];
+                foreach ($imagenes_producto as $img_item) {
+                    if ($img_item['es_principal']) { $img_principal = $img_item; break; }
+                }
+            ?>
+            <div class="product-img-wrapper" onclick="abrirLightbox(0)">
+                <img src="<?php echo BASE_URL . '/' . $img_principal['imagen']; ?>" alt="<?php echo htmlspecialchars($producto['nombre']); ?>" class="product-main-img" id="mainProductImg">
+                <div class="zoom-icon"><i class="fas fa-search-plus"></i></div>
+            </div>
+            
+            <?php if (count($imagenes_producto) > 1): ?>
+            <div class="product-thumbnails" id="productThumbnails">
+                <?php foreach ($imagenes_producto as $idx => $img_item): ?>
+                <div class="product-thumb <?php echo ($img_item['id'] == $img_principal['id']) ? 'active' : ''; ?>" 
+                     onclick="cambiarImagen('<?php echo BASE_URL . '/' . $img_item['imagen']; ?>', this, <?php echo $idx; ?>)">
+                    <img src="<?php echo BASE_URL . '/' . $img_item['imagen']; ?>" alt="Imagen <?php echo $idx + 1; ?>">
+                </div>
+                <?php endforeach; ?>
+            </div>
+            <?php endif; ?>
+        <?php elseif (!empty($producto['imagen']) && file_exists($producto['imagen'])): ?>
+            <div class="product-img-wrapper" onclick="abrirLightbox(0)">
+                <img src="<?php echo BASE_URL . '/' . $producto['imagen']; ?>" alt="<?php echo htmlspecialchars($producto['nombre']); ?>" class="product-main-img" id="mainProductImg">
+                <div class="zoom-icon"><i class="fas fa-search-plus"></i></div>
+            </div>
         <?php else: ?>
             <div class="product-placeholder-img">
                 <i class="fas fa-image"></i>
@@ -808,7 +920,7 @@ for ($i = 0; $i < $vacio; $i++)
             <?php
 else:
     $montoParts = explode('.', number_format($producto['precio'], 2));
-    $precio_usd = $producto['precio'] / 6.96;
+    $precio_usd = $producto['precio'] / floatval($CONFIG['tasa_cambio_usd'] ?? 6.96);
 ?>
                 <div class="price-label">Precio oficial</div>
                 <div class="price-amount">
@@ -852,7 +964,7 @@ else:
             
         <?php
 else: 
-    $precio_usd = $producto['precio'] / 6.96;
+    $precio_usd = $producto['precio'] / floatval($CONFIG['tasa_cambio_usd'] ?? 6.96);
 ?>
             <div class="buy-price">Bs. <?php echo number_format($producto['precio'], 2); ?></div>
             <div class="text-muted mb-3" style="font-size: 0.9rem;">(~$<?php echo number_format($precio_usd, 2); ?> USD)</div>
@@ -898,6 +1010,7 @@ else:
                     
                     <div id="comprobanteSection" class="comprobante-section">
                         <img id="qr_img" src="" alt="QR" class="qr-preview">
+                        <a id="btn_descargar_qr" href="#" download class="btn btn-sm btn-outline-light d-none mt-2 mb-2" style="font-size:0.8rem;"><i class="fas fa-download me-1"></i>Descargar QR</a>
                         <div class="mb-2" style="font-weight: 600; font-size: 0.9rem; margin-top: 10px;">Subir comprobante:</div>
                         <input type="file" class="form-control mb-2" name="comprobante" accept="image/*,application/pdf" required>
                         <button type="submit" class="btn-buy btn-primary-modern">
@@ -1053,22 +1166,101 @@ for ($i = 0; $i < $vacio; $i++)
     </div>
 </footer>
 
+<!-- Lightbox Modal -->
+<div class="lightbox-overlay" id="lightboxOverlay" onclick="cerrarLightbox(event)">
+    <button class="lightbox-close" onclick="cerrarLightbox(event)">&times;</button>
+    <button class="lightbox-arrow left" onclick="event.stopPropagation(); lightboxNav(-1)"><i class="fas fa-chevron-left"></i></button>
+    <img src="" alt="" class="lightbox-img" id="lightboxImg" onclick="event.stopPropagation()">
+    <button class="lightbox-arrow right" onclick="event.stopPropagation(); lightboxNav(1)"><i class="fas fa-chevron-right"></i></button>
+    <div class="lightbox-counter" id="lightboxCounter"></div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
+    // === LIGHTBOX ===
+    const lbImages = [
+        <?php if (!empty($imagenes_producto)): ?>
+            <?php foreach ($imagenes_producto as $i => $img_item): ?>
+                '<?php echo BASE_URL . '/' . $img_item['imagen']; ?>'<?php echo ($i < count($imagenes_producto) - 1) ? ',' : ''; ?>
+            <?php endforeach; ?>
+        <?php elseif (!empty($producto['imagen'])): ?>
+            '<?php echo BASE_URL . '/' . $producto['imagen']; ?>'
+        <?php endif; ?>
+    ];
+    let lbIndex = 0;
+
+    function abrirLightbox(idx) {
+        if (lbImages.length === 0) return;
+        lbIndex = idx || 0;
+        document.getElementById('lightboxImg').src = lbImages[lbIndex];
+        document.getElementById('lightboxCounter').textContent = (lbIndex + 1) + ' / ' + lbImages.length;
+        document.getElementById('lightboxOverlay').classList.add('active');
+        document.body.style.overflow = 'hidden';
+        // Hide arrows if only 1 image
+        document.querySelectorAll('.lightbox-arrow').forEach(a => a.style.display = lbImages.length > 1 ? 'flex' : 'none');
+        document.getElementById('lightboxCounter').style.display = lbImages.length > 1 ? 'block' : 'none';
+    }
+
+    function cerrarLightbox(e) {
+        if (e && e.target !== e.currentTarget && !e.target.closest('.lightbox-close')) return;
+        document.getElementById('lightboxOverlay').classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    function lightboxNav(dir) {
+        lbIndex = (lbIndex + dir + lbImages.length) % lbImages.length;
+        const img = document.getElementById('lightboxImg');
+        img.style.opacity = '0.3';
+        setTimeout(() => {
+            img.src = lbImages[lbIndex];
+            img.style.opacity = '1';
+        }, 150);
+        document.getElementById('lightboxCounter').textContent = (lbIndex + 1) + ' / ' + lbImages.length;
+    }
+
+    document.addEventListener('keydown', function(e) {
+        if (!document.getElementById('lightboxOverlay').classList.contains('active')) return;
+        if (e.key === 'Escape') cerrarLightbox(e);
+        if (e.key === 'ArrowLeft') lightboxNav(-1);
+        if (e.key === 'ArrowRight') lightboxNav(1);
+    });
+
+    // === CARRUSEL THUMBNAILS ===
+    let currentThumbIndex = 0;
+    function cambiarImagen(src, thumbEl, idx) {
+        const mainImg = document.getElementById('mainProductImg');
+        if (mainImg && mainImg.src !== src) {
+            mainImg.style.opacity = '0.3';
+            setTimeout(() => {
+                mainImg.src = src;
+                mainImg.style.opacity = '1';
+            }, 200);
+        }
+        currentThumbIndex = idx || 0;
+        document.querySelectorAll('.product-thumb').forEach(t => t.classList.remove('active'));
+        if (thumbEl) thumbEl.classList.add('active');
+        // Update lightbox wrapper click index
+        const wrapper = document.querySelector('.product-img-wrapper');
+        if (wrapper) wrapper.onclick = function() { abrirLightbox(currentThumbIndex); };
+    }
+
+    // === METODOS DE PAGO ===
     function selectMetodo(id, qr_url) {
         // Remover selección visual anterior
-        document.querySelectorAll('.metodo-pago-label').forEach(el => {
+        document.querySelectorAll('.payment-option').forEach(el => {
             el.classList.remove('selected');
-            el.querySelector('input[type="radio"]').checked = false;
+            const radio = el.querySelector('input[type="radio"]');
+            if (radio) radio.checked = false;
         });
         
-        // Aplicar selección al clickeado (via event currentTarget o si fue desde input)
-        let container = event.currentTarget.closest('.metodo-pago-label');
+        // Aplicar selección al clickeado
+        let container = event.currentTarget;
         if(container) {
             container.classList.add('selected');
-            container.querySelector('input[type="radio"]').checked = true;
+            const radio = container.querySelector('input[type="radio"]');
+            if (radio) radio.checked = true;
         }
         
         document.getElementById('id_tipo_pago').value = id;
@@ -1079,15 +1271,15 @@ for ($i = 0; $i < $vacio; $i++)
         if(qr_url) {
             qrImg.src = qr_url;
             qrImg.style.display = 'inline-block';
-            
-            btnDescargarQr.href = qr_url;
-            btnDescargarQr.classList.remove('d-none');
-            // Extract filename from URL to set proper download name
-            const fileName = qr_url.substring(qr_url.lastIndexOf('/') + 1) || 'QR_Pago.jpg';
-            btnDescargarQr.setAttribute('download', fileName);
+            if(btnDescargarQr) {
+                btnDescargarQr.href = qr_url;
+                btnDescargarQr.classList.remove('d-none');
+                const fileName = qr_url.substring(qr_url.lastIndexOf('/') + 1) || 'QR_Pago.jpg';
+                btnDescargarQr.setAttribute('download', fileName);
+            }
         } else {
             qrImg.style.display = 'none';
-            btnDescargarQr.classList.add('d-none');
+            if(btnDescargarQr) btnDescargarQr.classList.add('d-none');
         }
         
         // Mostrar form

@@ -298,6 +298,9 @@ if ($usuario_rol === ROL_SUPERADMIN) {
         ['icon' => 'fa-wallet', 'text' => 'Comisiones', 'url' => 'comisiones.php'],
         ['icon' => 'fa-credit-card', 'text' => 'Pagos', 'url' => 'tipos_pago.php'],
         
+        ['type' => 'header', 'text' => 'Sistema'],
+        ['icon' => 'fa-cog', 'text' => 'Ajustes', 'url' => 'ajustes.php'],
+        
         ['type' => 'header', 'text' => 'Acceso Rápido'],
         ['icon' => 'fa-shopping-bag', 'text' => 'Mis Compras', 'url' => 'mis_compras.php'],
         ['icon' => 'fa-store', 'text' => 'Ir a Tienda', 'url' => '../../tienda.php'],

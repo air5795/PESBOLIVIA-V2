@@ -1123,7 +1123,7 @@ if (!empty($url_params))
 
                         <div class="product-price">
                             <?php
-        $tasa_usd = 6.96;
+        $tasa_usd = floatval($CONFIG['tasa_cambio_usd'] ?? 6.96);
         if ($is_free):
 ?>
                                 <span class="price-currency">Bs.</span>

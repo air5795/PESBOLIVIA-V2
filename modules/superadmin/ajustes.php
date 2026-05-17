@@ -36,6 +36,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     guardar_config('email_sistema', $email_sistema);
     guardar_config('modo_mantenimiento', $modo_mantenimiento);
 
+    // Tasa de cambio USD
+    $tasa_raw = $_POST['tasa_cambio_usd'] ?? '6.96';
+    $tasa_raw = str_replace(',', '.', $tasa_raw);
+    $tasa_cambio_usd = floatval($tasa_raw);
+    if ($tasa_cambio_usd <= 0) $tasa_cambio_usd = 6.96;
+    guardar_config('tasa_cambio_usd', $tasa_cambio_usd);
+
     $_SESSION['mensaje_exito'] = 'Configuración actualizada exitosamente.';
     
     // Recargar config global para reflejar inmediatamente
@@ -121,6 +128,25 @@ include '../../includes/header.php';
                         <div class="col-md-6 mb-3">
                             <label class="form-label fw-semibold">Email Principal de Contacto</label>
                             <input type="email" class="form-control form-control-lg bg-light" name="email_sistema" value="<?php echo htmlspecialchars(EMAIL_SISTEMA); ?>" required>
+                        </div>
+                    </div>
+
+                    <h5 class="fw-bold text-dark mt-4 mb-3"><i class="fas fa-dollar-sign me-2 text-success"></i>Tipo de Cambio</h5>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold">Tasa de Cambio USD (1 USD = ? Bs.)</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-success text-white"><i class="fas fa-exchange-alt"></i></span>
+                                <input type="number" class="form-control form-control-lg bg-light" name="tasa_cambio_usd" step="0.01" min="0.01" value="<?php echo htmlspecialchars($CONFIG['tasa_cambio_usd'] ?? '6.96'); ?>" required>
+                                <span class="input-group-text bg-light">Bs.</span>
+                            </div>
+                            <small class="text-muted"><i class="fas fa-info-circle me-1"></i>Se usa para mostrar el precio aproximado en USD en la tienda y productos.</small>
+                        </div>
+                        <div class="col-md-6 mb-3 d-flex align-items-center">
+                            <div class="alert alert-info bg-opacity-10 border-0 mb-0 w-100" style="border-radius: 12px;">
+                                <i class="fas fa-calculator me-2"></i>
+                                <strong>Ejemplo:</strong> Si un producto cuesta Bs. 50 y la tasa es <?php echo $CONFIG['tasa_cambio_usd'] ?? '6.96'; ?>, se mostrará como ~$<?php echo number_format(50 / floatval($CONFIG['tasa_cambio_usd'] ?? 6.96), 2); ?> USD
+                            </div>
                         </div>
                     </div>
                     

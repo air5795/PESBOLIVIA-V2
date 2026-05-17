@@ -7,8 +7,10 @@
     RewriteEngine On
     RewriteBase /
     
-    # Forzar HTTPS en producción
+    # Forzar HTTPS en producción (solo si NO es localhost)
     RewriteCond %{HTTPS} off
+    RewriteCond %{HTTP_HOST} !^localhost$ [NC]
+    RewriteCond %{HTTP_HOST} !^127\.0\.0\.1$ [NC]
     RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
     
     # Evitar acceso directo a archivos de configuración
@@ -41,8 +43,9 @@ Options -Indexes
 # =====================================================
 # LÍMITES DE SUBIDA
 # =====================================================
-php_value upload_max_filesize 1M
-php_value post_max_size 2M
+php_value upload_max_filesize 2M
+php_value post_max_size 50M
+php_value max_file_uploads 30
 php_value max_execution_time 300
 php_value max_input_time 300
 
