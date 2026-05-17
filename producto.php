@@ -508,10 +508,8 @@ $page_title = $producto['nombre'];
             top: 100px;
         }
         .product-main-img { 
-            width: auto !important;
-            height: auto !important;
-            max-width: 100% !important; 
-            max-height: 100% !important; 
+            width: 100% !important;
+            height: 100% !important;
             object-fit: contain !important; 
             border-radius: var(--radius-md) !important; 
             transition: opacity 0.3s ease !important; 
@@ -530,21 +528,23 @@ $page_title = $producto['nombre'];
         /* Carrusel de imágenes */
         .product-thumbnails {
             display: flex !important;
-            justify-content: center !important;
+            justify-content: flex-start !important;
             gap: 8px !important;
             margin-top: 12px !important;
             overflow-x: auto !important;
+            overflow-y: hidden !important;
             padding-bottom: 6px !important;
             scrollbar-width: thin !important;
             scrollbar-color: var(--primary-color) var(--surface) !important;
+            flex-wrap: nowrap !important;
         }
         .product-thumbnails::-webkit-scrollbar { height: 4px !important; }
         .product-thumbnails::-webkit-scrollbar-track { background: var(--surface) !important; border-radius: 2px !important; }
         .product-thumbnails::-webkit-scrollbar-thumb { background: var(--primary-color) !important; border-radius: 2px !important; }
         .product-thumb {
-            width: 70px !important;
-            height: 70px !important;
-            min-width: 70px !important;
+            flex: 0 0 calc(25% - 6px) !important;
+            aspect-ratio: 1 / 1 !important;
+            height: auto !important;
             border-radius: var(--radius-sm) !important;
             overflow: hidden !important;
             cursor: pointer !important;
