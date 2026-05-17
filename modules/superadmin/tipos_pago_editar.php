@@ -182,8 +182,8 @@ $extra_js = "
 document.getElementById('inputQR').addEventListener('change', function(e) {
     const file = e.target.files[0];
     if (file) {
-        if (file.size > 1048576) {
-            mostrarAlerta('warning', 'Archivo muy grande', 'La imagen no debe superar 1MB');
+        if (file.size > 2097152) {
+            mostrarAlerta('warning', 'Archivo muy grande', 'La imagen no debe superar 2MB');
             this.value = '';
             return;
         }

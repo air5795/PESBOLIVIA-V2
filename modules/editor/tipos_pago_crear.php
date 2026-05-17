@@ -127,7 +127,7 @@ include '../../includes/header.php';
                         <input type="file" class="form-control" name="imagen_qr" 
                                accept="image/jpeg,image/png,image/jpg" 
                                id="inputQR">
-                        <small class="text-muted">JPG o PNG. Máximo 1MB</small>
+                        <small class="text-muted">JPG o PNG. Máximo 2MB</small>
                     </div>
                     
                     <div id="previewQR" style="display: none;">
@@ -163,8 +163,8 @@ $extra_js = "
 document.getElementById('inputQR').addEventListener('change', function(e) {
     const file = e.target.files[0];
     if (file) {
-        if (file.size > 1048576) {
-            mostrarAlerta('warning', 'Archivo muy grande', 'La imagen no debe superar 1MB');
+        if (file.size > 2097152) {
+            mostrarAlerta('warning', 'Archivo muy grande', 'La imagen no debe superar 2MB');
             this.value = '';
             return;
         }

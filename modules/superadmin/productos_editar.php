@@ -264,8 +264,8 @@ document.getElementById('inputImagenes').addEventListener('change', function(e) 
     }
     
     Array.from(files).forEach((file, index) => {
-        if (file.size > 1048576) {
-            alert('La imagen ' + file.name + ' supera 1MB');
+        if (file.size > 2097152) {
+            alert('La imagen ' + file.name + ' supera 2MB');
             return;
         }
         const reader = new FileReader();
