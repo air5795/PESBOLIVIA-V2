@@ -21,8 +21,11 @@ $query = "SELECT p.*, c.nombre as categoria_nombre,
           COALESCE(AVG(r.calificacion), 0) as promedio_resenas, 
           COUNT(r.id) as total_resenas,
           (SELECT CASE 
+                    WHEN COUNT(pe2.id_editor) = 0 THEN 'PES Bolivia'
+                    WHEN COUNT(pe2.id_editor) > 1 THEN 'PES Bolivia'
+                    WHEN SUM(pe2.porcentaje) < 99.99 THEN 'PES Bolivia'
                     WHEN COUNT(CASE WHEN u2.rol = 'superadmin' THEN 1 END) > 0 THEN 'PES Bolivia'
-                    ELSE GROUP_CONCAT(u2.usuario ORDER BY pe2.porcentaje DESC SEPARATOR ', ')
+                    ELSE MAX(u2.usuario)
                   END
            FROM producto_editores pe2 
            JOIN usuarios u2 ON pe2.id_editor = u2.id 
