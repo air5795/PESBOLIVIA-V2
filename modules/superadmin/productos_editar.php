@@ -227,6 +227,23 @@ endwhile; ?>
                     <div id="previewImagenes" class="d-flex flex-wrap gap-2"></div>
                 </div>
             </div>
+            <!-- OPCIÓN FIJAR PRODUCTO (Solo Superadmin) -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-thumbtack me-2"></i>Fijar en Tienda</h5>
+                </div>
+                <div class="card-body">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" name="fijado" value="si" id="fijarProducto"
+                               <?php echo (isset($producto['fijado']) && $producto['fijado'] === 'si') ? 'checked' : ''; ?>>
+                        <label class="form-check-label fw-bold" for="fijarProducto">Fijar al inicio de la tienda</label>
+                    </div>
+                    <small class="text-muted d-block mt-2">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Si lo activas, este producto se mostrará en la parte superior de la tienda por encima de todos los demás.
+                    </small>
+                </div>
+            </div>
             
             <div class="card">
                 <div class="card-body">

@@ -20,18 +20,14 @@ $id_usuario_actual = Session::get_user_id() ?? 0;
 $query = "SELECT p.*, c.nombre as categoria_nombre, 
           COALESCE(AVG(r.calificacion), 0) as promedio_resenas, 
           COUNT(r.id) as total_resenas,
-          u.usuario as editor_nombre,
-          (SELECT COUNT(*) FROM producto_editores pe2 WHERE pe2.id_producto = p.id AND pe2.id_editor = $id_usuario_actual) as es_mi_producto
+          (SELECT GROUP_CONCAT(u2.usuario ORDER BY pe2.porcentaje DESC SEPARATOR ', ') 
+           FROM producto_editores pe2 
+           JOIN usuarios u2 ON pe2.id_editor = u2.id 
+           WHERE pe2.id_producto = p.id) as editor_nombre,
+          (SELECT COUNT(*) FROM producto_editores pe3 WHERE pe3.id_producto = p.id AND pe3.id_editor = $id_usuario_actual) as es_mi_producto
           FROM productos p
           LEFT JOIN categorias c ON p.id_categoria = c.id
           LEFT JOIN resenas r ON p.id = r.id_producto
-          LEFT JOIN (
-              SELECT id_producto, MIN(id) as first_pe_id 
-              FROM producto_editores 
-              GROUP BY id_producto
-          ) pe_first ON p.id = pe_first.id_producto
-          LEFT JOIN producto_editores pe ON pe_first.first_pe_id = pe.id
-          LEFT JOIN usuarios u ON pe.id_editor = u.id
           WHERE p.estado = 'activo'";
 
 // Aplicar filtro de categoría
@@ -70,7 +66,7 @@ elseif ($orden === 'novedades' || $orden === 'ultimos') {
     $order_by = "p.fecha_creacion DESC";
 }
 
-$query .= " GROUP BY p.id ORDER BY p.es_gratuito ASC, " . $order_by;
+$query .= " GROUP BY p.id ORDER BY (p.fijado = 'si') DESC, p.es_gratuito ASC, " . $order_by;
 
 // Obtener total para "Ver más"
 $query_count = "SELECT COUNT(*) as total FROM (" . $query . ") as count_table";
@@ -646,6 +642,24 @@ if ($categorias) {
             50% { transform: scale(1.05); }
         }
 
+        /* Badge Fijado */
+        .pinned-badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: #f1c40f; /* Dorado premium */
+            color: #0a0a0f;
+            padding: 5px 12px;
+            border-radius: var(--radius-full);
+            font-size: 0.7rem;
+            font-weight: 700;
+            z-index: 10;
+            box-shadow: 0 4px 15px rgba(241, 196, 15, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
         /* Imagen del Producto */
         .product-image {
             height: 180px;
@@ -1083,8 +1097,10 @@ if (!empty($url_params))
                 <div class="product-card">
                     <?php if ($is_free): ?>
                         <div class="free-badge"><i class="fas fa-gift me-1"></i>GRATIS</div>
-                    <?php
-        endif; ?>
+                    <?php endif; ?>
+                    <?php if (isset($producto['fijado']) && $producto['fijado'] === 'si'): ?>
+                        <div class="pinned-badge"><i class="fas fa-thumbtack me-1"></i>FIJADO</div>
+                    <?php endif; ?>
                     
                     <a href="producto.php?id=<?php echo $producto['id']; ?>" class="product-image">
                         <?php if (!empty($producto['imagen']) && file_exists($producto['imagen'])): ?>

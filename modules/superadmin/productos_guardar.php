@@ -22,6 +22,7 @@ $requisitos = limpiar_texto($_POST['requisitos'] ?? '');
 $drive_link = limpiar_texto($_POST['drive_link'] ?? '');
 $link_descarga_directa = limpiar_texto($_POST['link_descarga_directa'] ?? '');
 $estado = limpiar_texto($_POST['estado']);
+$fijado = isset($_POST['fijado']) && $_POST['fijado'] === 'si' ? 'si' : 'no';
 $imagen_principal_index = intval($_POST['imagen_principal_index'] ?? 0);
 
 $errores = [];
@@ -147,19 +148,19 @@ if ($id > 0) {
     if (!empty($imagen_path)) {
         $query = "UPDATE productos SET nombre = ?, id_categoria = ?, descripcion = ?, es_gratuito = ?, precio = ?, 
                   id_tipo_pago = ?, version = ?, requisitos = ?, drive_link = ?, link_descarga_directa = ?, imagen = ?, estado = ?, 
-                  tipo_producto = ?, fecha_actualizacion = NOW() 
+                  tipo_producto = ?, fijado = ?, fecha_actualizacion = NOW() 
                   WHERE id = ?";
         $stmt = mysqli_prepare($conexion, $query);
-        mysqli_stmt_bind_param($stmt, "sissdssssssssi", $nombre, $id_categoria, $descripcion, $es_gratuito, $precio, $id_tipo_pago,
-            $version, $requisitos, $drive_link, $link_descarga_directa, $imagen_path, $estado, $tipo_producto, $id);
+        mysqli_stmt_bind_param($stmt, "sissdsssssssssi", $nombre, $id_categoria, $descripcion, $es_gratuito, $precio, $id_tipo_pago,
+            $version, $requisitos, $drive_link, $link_descarga_directa, $imagen_path, $estado, $tipo_producto, $fijado, $id);
     } else {
         $query = "UPDATE productos SET nombre = ?, id_categoria = ?, descripcion = ?, es_gratuito = ?, precio = ?, 
                   id_tipo_pago = ?, version = ?, requisitos = ?, drive_link = ?, link_descarga_directa = ?, estado = ?,
-                  tipo_producto = ?, fecha_actualizacion = NOW() 
+                  tipo_producto = ?, fijado = ?, fecha_actualizacion = NOW() 
                   WHERE id = ?";
         $stmt = mysqli_prepare($conexion, $query);
-        mysqli_stmt_bind_param($stmt, "sissdsssssssi", $nombre, $id_categoria, $descripcion, $es_gratuito, $precio, $id_tipo_pago,
-            $version, $requisitos, $drive_link, $link_descarga_directa, $estado, $tipo_producto, $id);
+        mysqli_stmt_bind_param($stmt, "sissdssssssssi", $nombre, $id_categoria, $descripcion, $es_gratuito, $precio, $id_tipo_pago,
+            $version, $requisitos, $drive_link, $link_descarga_directa, $estado, $tipo_producto, $fijado, $id);
     }
 
     if (mysqli_stmt_execute($stmt)) {
@@ -205,11 +206,11 @@ if ($id > 0) {
 
 } else {
     // Crear nuevo producto
-    $query = "INSERT INTO productos (nombre, id_categoria, descripcion, tipo_producto, es_gratuito, id_tipo_pago, precio, version, requisitos, drive_link, link_descarga_directa, imagen, estado) 
-              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    $query = "INSERT INTO productos (nombre, id_categoria, descripcion, tipo_producto, es_gratuito, id_tipo_pago, precio, version, requisitos, drive_link, link_descarga_directa, imagen, estado, fijado) 
+              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     $stmt = mysqli_prepare($conexion, $query);
-    mysqli_stmt_bind_param($stmt, "sissssdssssss", $nombre, $id_categoria, $descripcion, $tipo_producto, $es_gratuito, $id_tipo_pago, $precio,
-        $version, $requisitos, $drive_link, $link_descarga_directa, $imagen_path, $estado);
+    mysqli_stmt_bind_param($stmt, "sissssdsssssss", $nombre, $id_categoria, $descripcion, $tipo_producto, $es_gratuito, $id_tipo_pago, $precio,
+        $version, $requisitos, $drive_link, $link_descarga_directa, $imagen_path, $estado, $fijado);
 
     if (mysqli_stmt_execute($stmt)) {
         $nuevo_id = mysqli_insert_id($conexion);
