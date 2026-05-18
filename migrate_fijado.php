@@ -1,5 +1,7 @@
 <?php
-$_SERVER['SERVER_NAME'] = 'localhost';
+if (php_sapi_name() === 'cli' && !isset($_SERVER['SERVER_NAME'])) {
+    $_SERVER['SERVER_NAME'] = 'localhost';
+}
 require_once 'config/config.php';
 
 echo "Iniciando migración...\n";
