@@ -12,8 +12,8 @@ if (!isset($_GET['id'])) {
 $id = intval($_GET['id']);
 $id_editor = Session::get_user_id();
 
-// Verificar que el producto pertenece al editor
-$query = "SELECT p.nombre, p.imagen FROM productos p
+// Verificar que el producto pertenece al editor y que es dueño al 100% (no es un producto compartido o del admin)
+$query = "SELECT p.nombre, p.imagen, pe.porcentaje FROM productos p
           INNER JOIN producto_editores pe ON p.id = pe.id_producto
           WHERE p.id = ? AND pe.id_editor = ?";
 $stmt = mysqli_prepare($conexion, $query);
@@ -23,6 +23,12 @@ $result = mysqli_stmt_get_result($stmt);
 
 if (!$producto = mysqli_fetch_assoc($result)) {
     $_SESSION['error'] = "Producto no encontrado o no tienes permiso";
+    mysqli_stmt_close($stmt);
+    redirect('productos.php');
+}
+
+if (floatval($producto['porcentaje']) < 100.00) {
+    $_SESSION['error'] = "No tienes permiso para eliminar este producto porque es de autoría compartida o del administrador";
     mysqli_stmt_close($stmt);
     redirect('productos.php');
 }

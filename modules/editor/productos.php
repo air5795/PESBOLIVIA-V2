@@ -112,20 +112,23 @@ include '../../includes/header.php';
                                     <i class="fas fa-edit me-1"></i>
                                     Editar Producto
                                 </a>
-                                <?php if ($producto['total_ventas'] == 0): ?>
-                                    <button class="btn btn-outline-danger btn-sm" 
-                                            onclick="confirmarEliminacion('productos_eliminar.php?id=<?php echo $producto['id']; ?>', '¿Eliminar <?php echo addslashes($producto['nombre']); ?>?')">
-                                        <i class="fas fa-trash me-1"></i>
-                                        Eliminar
-                                    </button>
-                                <?php
-        else: ?>
-                                    <small class="text-muted text-center">
-                                        <i class="fas fa-info-circle me-1"></i>
-                                        No se puede eliminar (tiene ventas)
-                                    </small>
-                                <?php
-        endif; ?>
+                                 <?php if ($producto['total_ventas'] == 0 && floatval($producto['porcentaje']) == 100.00): ?>
+                                     <button class="btn btn-outline-danger btn-sm" 
+                                             onclick="confirmarEliminacion('productos_eliminar.php?id=<?php echo $producto['id']; ?>', '¿Eliminar <?php echo addslashes($producto['nombre']); ?>?')">
+                                         <i class="fas fa-trash me-1"></i>
+                                         Eliminar
+                                     </button>
+                                 <?php elseif ($producto['total_ventas'] > 0): ?>
+                                     <small class="text-muted text-center">
+                                         <i class="fas fa-info-circle me-1"></i>
+                                         No se puede eliminar (tiene ventas)
+                                     </small>
+                                 <?php else: ?>
+                                     <small class="text-muted text-center">
+                                         <i class="fas fa-info-circle me-1"></i>
+                                         No se puede eliminar (autoría compartida)
+                                     </small>
+                                 <?php endif; ?>
                             </div>
                         </div>
                     </div>
