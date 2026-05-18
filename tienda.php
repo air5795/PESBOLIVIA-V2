@@ -20,7 +20,10 @@ $id_usuario_actual = Session::get_user_id() ?? 0;
 $query = "SELECT p.*, c.nombre as categoria_nombre, 
           COALESCE(AVG(r.calificacion), 0) as promedio_resenas, 
           COUNT(r.id) as total_resenas,
-          (SELECT GROUP_CONCAT(u2.usuario ORDER BY pe2.porcentaje DESC SEPARATOR ', ') 
+          (SELECT CASE 
+                    WHEN COUNT(CASE WHEN u2.rol = 'superadmin' THEN 1 END) > 0 THEN 'PES Bolivia'
+                    ELSE GROUP_CONCAT(u2.usuario ORDER BY pe2.porcentaje DESC SEPARATOR ', ')
+                  END
            FROM producto_editores pe2 
            JOIN usuarios u2 ON pe2.id_editor = u2.id 
            WHERE pe2.id_producto = p.id) as editor_nombre,
