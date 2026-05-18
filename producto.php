@@ -1174,11 +1174,143 @@ $page_title = $producto['nombre'];
             }
         }
 
-        .qr-preview {
-            max-width: 120px;
-            border-radius: var(--radius-sm);
+        .qr-container {
+            position: relative;
+            max-width: 140px;
+            margin: 10px auto;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            cursor: pointer;
+            border: 2px solid var(--border);
+            transition: all 0.3s ease;
+            background: #fff;
+            padding: 6px;
             display: none;
-            margin: 0 auto 8px;
+        }
+
+        .qr-container:hover {
+            transform: translateY(-2px) scale(1.03);
+            border-color: var(--primary-color);
+            box-shadow: 0 8px 25px rgba(39, 204, 160, 0.25);
+        }
+
+        .qr-container .qr-lupa-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(10, 10, 15, 0.75);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            border-radius: var(--radius-md);
+            color: var(--primary-color);
+            font-size: 1.4rem;
+        }
+
+        .qr-container:hover .qr-lupa-overlay {
+            opacity: 1;
+        }
+
+        .qr-preview {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            border-radius: var(--radius-sm);
+            background: #fff;
+            margin: 0 auto;
+        }
+
+        /* Modal de Zoom de QR */
+        .qr-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 10000;
+            background: rgba(10, 10, 15, 0.95);
+            backdrop-filter: blur(8px);
+            align-items: center;
+            justify-content: center;
+            animation: qrFadeIn 0.25s ease;
+        }
+
+        .qr-modal.active {
+            display: flex;
+        }
+
+        .qr-modal-content {
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 30px;
+            max-width: 420px;
+            width: 90%;
+            text-align: center;
+            position: relative;
+            box-shadow: var(--shadow-lg);
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+
+        .qr-modal.active .qr-modal-content {
+            transform: scale(1);
+        }
+
+        .qr-modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .qr-modal-close:hover {
+            background: var(--primary-color);
+            color: #0a0a0f;
+            border-color: var(--primary-color);
+        }
+
+        .qr-modal-img {
+            max-width: 280px;
+            width: 100%;
+            height: auto;
+            border-radius: var(--radius-md);
+            background: #fff;
+            padding: 10px;
+            border: 3px solid var(--primary-color);
+            box-shadow: 0 0 25px var(--primary-glow);
+            margin: 15px auto;
+        }
+
+        .qr-modal-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 5px;
+        }
+
+        .qr-modal-text {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 15px;
+        }
+
+        @keyframes qrFadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
         }
 
         /* Description */
@@ -1788,11 +1920,18 @@ $page_title = $producto['nombre'];
                                 <div class="text-danger small mb-3">No hay métodos de pago disponibles</div>
                             <?php endif; ?>
 
-                            <div id="comprobanteSection" class="comprobante-section">
-                                <img id="qr_img" src="" alt="QR" class="qr-preview">
-                                <a id="btn_descargar_qr" href="#" download class="btn btn-sm btn-outline-light d-none mt-2 mb-2"
-                                    style="font-size:0.8rem;"><i class="fas fa-download me-1"></i>Descargar QR</a>
-                                <div class="mb-2" style="font-weight: 600; font-size: 0.9rem; margin-top: 10px;">Subir
+                            <div id="comprobanteSection" class="comprobante-section text-center">
+                                <div class="qr-container" id="qrContainer" onclick="abrirQrModal()">
+                                    <img id="qr_img" src="" alt="QR" class="qr-preview">
+                                    <div class="qr-lupa-overlay">
+                                        <i class="fas fa-search-plus"></i>
+                                    </div>
+                                </div>
+                                <div>
+                                    <a id="btn_descargar_qr" href="#" download class="btn btn-sm btn-outline-light d-none mt-2 mb-2"
+                                        style="font-size:0.8rem;"><i class="fas fa-download me-1"></i>Descargar QR</a>
+                                </div>
+                                <div class="mb-2 text-start" style="font-weight: 600; font-size: 0.9rem; margin-top: 10px;">Subir
                                     comprobante:</div>
                                 <input type="file" class="form-control mb-3" name="comprobante" accept="image/*,application/pdf"
                                     required>
@@ -1991,6 +2130,21 @@ $page_title = $producto['nombre'];
         <div class="lightbox-counter" id="lightboxCounter"></div>
     </div>
 
+    <!-- QR Zoom Modal -->
+    <div class="qr-modal" id="qrModal" onclick="cerrarQrModal(event)">
+        <div class="qr-modal-content" onclick="event.stopPropagation()">
+            <button class="qr-modal-close" onclick="cerrarQrModal(event)">&times;</button>
+            <h4 class="qr-modal-title"><i class="fas fa-qrcode me-2 text-primary"></i>Escanea el código QR</h4>
+            <p class="qr-modal-text">Escanea este código con tu app bancaria para realizar la transferencia.</p>
+            <img id="qrModalImg" src="" alt="QR Ampliado" class="qr-modal-img">
+            <div class="mt-2">
+                <a id="btn_descargar_qr_modal" href="#" download class="btn btn-primary-modern px-4 py-2" style="font-size: 0.9rem; border-radius: var(--radius-full);">
+                    <i class="fas fa-download me-2"></i>Descargar Imagen QR
+                </a>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
@@ -2037,10 +2191,16 @@ $page_title = $producto['nombre'];
         }
 
         document.addEventListener('keydown', function (e) {
-            if (!document.getElementById('lightboxOverlay').classList.contains('active')) return;
-            if (e.key === 'Escape') cerrarLightbox(e);
-            if (e.key === 'ArrowLeft') lightboxNav(-1);
-            if (e.key === 'ArrowRight') lightboxNav(1);
+            // Lightbox keys
+            if (document.getElementById('lightboxOverlay').classList.contains('active')) {
+                if (e.key === 'Escape') cerrarLightbox(e);
+                if (e.key === 'ArrowLeft') lightboxNav(-1);
+                if (e.key === 'ArrowRight') lightboxNav(1);
+            }
+            // QR Modal keys
+            if (document.getElementById('qrModal').classList.contains('active')) {
+                if (e.key === 'Escape') cerrarQrModal(e);
+            }
         });
 
         // === CARRUSEL THUMBNAILS ===
@@ -2083,10 +2243,11 @@ $page_title = $producto['nombre'];
 
             // Manejar QR
             let qrImg = document.getElementById('qr_img');
+            let qrContainer = document.getElementById('qrContainer');
             let btnDescargarQr = document.getElementById('btn_descargar_qr');
             if (qr_url) {
                 qrImg.src = qr_url;
-                qrImg.style.display = 'inline-block';
+                if (qrContainer) qrContainer.style.display = 'inline-block';
                 if (btnDescargarQr) {
                     btnDescargarQr.href = qr_url;
                     btnDescargarQr.classList.remove('d-none');
@@ -2094,12 +2255,38 @@ $page_title = $producto['nombre'];
                     btnDescargarQr.setAttribute('download', fileName);
                 }
             } else {
-                qrImg.style.display = 'none';
+                if (qrContainer) qrContainer.style.display = 'none';
                 if (btnDescargarQr) btnDescargarQr.classList.add('d-none');
             }
 
             // Mostrar form
             document.getElementById('comprobanteSection').style.display = 'block';
+        }
+
+        // === QR ZOOM MODAL ===
+        function abrirQrModal() {
+            const qr_url = document.getElementById('qr_img').src;
+            if (!qr_url) return;
+            document.getElementById('qrModalImg').src = qr_url;
+            
+            const btnDescargarModal = document.getElementById('btn_descargar_qr_modal');
+            if (btnDescargarModal) {
+                btnDescargarModal.href = qr_url;
+                const fileName = qr_url.substring(qr_url.lastIndexOf('/') + 1) || 'QR_Pago.jpg';
+                btnDescargarModal.setAttribute('download', fileName);
+            }
+            
+            document.getElementById('qrModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function cerrarQrModal(e) {
+            if (e && e.target !== e.currentTarget && !e.target.closest('.qr-modal-close')) return;
+            document.getElementById('qrModal').classList.remove('active');
+            // Restablecer scroll si el lightbox principal no está abierto
+            if (!document.getElementById('lightboxOverlay').classList.contains('active')) {
+                document.body.style.overflow = '';
+            }
         }
 
         // Validar formulario pre-submit y agregar loading
